@@ -1093,7 +1093,7 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float att
 						continue;
 					}
 
-					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) >= 350.0f 
+					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 350.0f 
 					&& ((refr->GetEquippedObject(false)->As<RE::TESObjectWEAP>()->IsMelee()) 
 					|| (refr->GetEquippedObject(true)->As<RE::TESObjectWEAP>()->IsMelee())) 
 					&& !is_adequate_threat(refr, a_attacker)){
@@ -1165,7 +1165,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 
-					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) >= 350.0f 
+					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 350.0f 
 					&& ((refr->GetEquippedObject(false)->As<RE::TESObjectWEAP>()->IsMelee()) 
 					|| (refr->GetEquippedObject(true)->As<RE::TESObjectWEAP>()->IsMelee())) 
 					&& !is_adequate_threat(refr, a_attacker)){
