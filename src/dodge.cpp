@@ -1402,7 +1402,7 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 	std::mt19937 gen(rd());
 
 	if (attack_speed > 0.0f) {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance * attack_speed)) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance/attack_speed)) {
 			return;
 		}
 	} else {
@@ -1478,7 +1478,7 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 	std::mt19937 gen(rd());
 
 	if (attack_speed > 0.0f) {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance * attack_speed)) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance/attack_speed)) {
 			return;
 		}
 	} else {
@@ -1597,7 +1597,7 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 	std::mt19937 gen(rd());
 
 	if (mov_speed > 0.0f) {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance * mov_speed)) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance/mov_speed)) {
 			return;
 		}
 	} else {
