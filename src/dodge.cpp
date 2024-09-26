@@ -694,7 +694,7 @@ bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 		}
 	}
 	if (My_threat > 0 && Enemy_threat > 0) {
-		logger::info("Name {} ranged_threat {}"sv, protagonist->GetName(), (My_threat / Enemy_threat));
+		logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (My_threat / Enemy_threat));
 		if ((My_threat / Enemy_threat) <= 0.625f) {
 			adequate_threat = true;
 		}
