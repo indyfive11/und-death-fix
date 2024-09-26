@@ -58,26 +58,26 @@ namespace hooks
 			if ((!Utils::Actor::isHumanoid(actor) || Utils::Actor::isPowerAttacking(actor)) 
 			&& (!(actor->AsActorState()->GetAttackState() == RE::ATTACK_STATE_ENUM::kBash || actor->AsActorState()->GetAttackState() == RE::ATTACK_STATE_ENUM::kHit))) {
 				
-				dodge::GetSingleton()->react_to_melee(actor, dodge::GetSingleton()->Get_ReactiveDodge_Distance(actor));
+				dodge::retreive_execute_attacks(actor, true);
 
 			} else if ((!Utils::Actor::isPowerAttacking(actor) && actor->AsActorState()->GetAttackState() != RE::ATTACK_STATE_ENUM::kBash) 
 			&& (actor->AsActorState()->GetAttackState() == RE::ATTACK_STATE_ENUM::kDraw || actor->AsActorState()->GetAttackState() == RE::ATTACK_STATE_ENUM::kSwing)) {
 				
-				dodge::GetSingleton()->react_to_melee(actor, dodge::GetSingleton()->Get_ReactiveDodge_Distance(actor));
+				dodge::retreive_execute_attacks(actor, true);
 
 			} else if (actor->AsActorState()->IsSprinting() && actor->AsActorState()->GetAttackState() == RE::ATTACK_STATE_ENUM::kBash) {
 				bool bMaxsuWeaponParry_InWeaponParry = false;
 				if ((actor)
 						->GetGraphVariableBool("bMaxsuWeaponParry_InWeaponParry", bMaxsuWeaponParry_InWeaponParry) &&
 					!bMaxsuWeaponParry_InWeaponParry) {
-					dodge::GetSingleton()->react_to_bash_sprint(actor, dodge::GetSingleton()->Get_ReactiveDodge_Distance(actor));
+					dodge::retreive_execute_attacks(actor, false, false, false, false, true);
 				}
 			} else if (!actor->AsActorState()->IsSprinting() && actor->AsActorState()->GetAttackState() == RE::ATTACK_STATE_ENUM::kBash && Utils::Actor::isPowerAttacking(actor)) {
 				bool bMaxsuWeaponParry_InWeaponParry = false;
 				if ((actor)
 						->GetGraphVariableBool("bMaxsuWeaponParry_InWeaponParry", bMaxsuWeaponParry_InWeaponParry) &&
 					!bMaxsuWeaponParry_InWeaponParry) {
-					dodge::GetSingleton()->react_to_bash(actor, dodge::GetSingleton()->Get_ReactiveDodge_Distance(actor));
+					dodge::retreive_execute_attacks(actor, false, false, false, true, false);
 				}
 			}
 			break;
@@ -105,12 +105,12 @@ namespace hooks
 
 		case "PowerAttack_Start_end"_h:
 		case "NextAttackInitiate"_h:
-			dodge::GetSingleton()->react_to_melee_normal(actor, dodge::GetSingleton()->Get_ReactiveDodge_Distance(actor));
+			dodge::retreive_execute_attacks(actor, false, true);
 			break;
 
 		case "BowFullDrawn"_h:
 
-			dodge::GetSingleton()->react_to_ranged(actor, dodge::GetSingleton()->Get_ReactiveDodge_Distance(actor));
+			dodge::retreive_execute_attacks(actor, false, false, true);
 			break;
 		}
 
@@ -137,6 +137,16 @@ namespace hooks
 			break;
 		}
 		return result;
+	}
+
+	void retreive_execute(RE::Actor* a_actor, RE::SpellItem* a_spell)
+	{
+		auto it = dodge::GetSingleton()->GetAttackSpell_Alt(a_spell);
+
+		if (it.first){
+			dodge::GetSingleton()->react_to_shouts_spells(a_actor, 3000.0f, it.second);
+		}
+		
 	}
 
 	class OurEventSink : public RE::BSTEventSink<RE::TESCombatEvent>, public RE::BSTEventSink<RE::TESSpellCastEvent>
@@ -209,19 +219,17 @@ namespace hooks
 				case RE::MagicSystem::SpellType::kVoicePower:
 				case RE::MagicSystem::SpellType::kPower:
 				case RE::MagicSystem::SpellType::kLesserPower:
-					if (GetEquippedShouts(rSpell) && dodge::GetSingleton()->GetAttackSpell_Alt(rSpell)) {
-						dodge::GetSingleton()->react_to_shouts_spells(Protagonist, 3000.0f);
+					if (GetEquippedShouts(rSpell)) {
+						retreive_execute(Protagonist, rSpell);
 					}
 					break;
 				case RE::MagicSystem::SpellType::kSpell:
 				case RE::MagicSystem::SpellType::kScroll:
-					if (dodge::GetSingleton()->GetAttackSpell_Alt(rSpell)) {
-						dodge::GetSingleton()->react_to_shouts_spells(Protagonist, 3000.0f);
-					}
+					retreive_execute(Protagonist, rSpell);
 					break;
 				case RE::MagicSystem::SpellType::kStaffEnchantment:
-					if (rSpell->GetDelivery() != RE::MagicSystem::Delivery::kTouch && dodge::GetSingleton()->GetAttackSpell_Alt(rSpell)) {
-						dodge::GetSingleton()->react_to_shouts_spells(Protagonist, 3000.0f);
+					if (rSpell->GetDelivery() != RE::MagicSystem::Delivery::kTouch) {
+						retreive_execute(Protagonist, rSpell);
 					}
 					break;
 				default:

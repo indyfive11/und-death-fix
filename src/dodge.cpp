@@ -325,9 +325,11 @@ float dodge::get_stamina_basecost(RE::Actor* a_actor, const Stamina_factors& Sta
 	}
 }
 
-float dodge::Get_ReactiveDodge_Distance(RE::Actor *actor) {
-
+std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
+{
 	float distance = 200.0f;
+	float attack_speed = 0.0f;
+	bool IsLeftAttack = false;
 	
 	auto aiProcess = actor->GetActorRuntimeData().currentProcess;
 
@@ -335,8 +337,12 @@ float dodge::Get_ReactiveDodge_Distance(RE::Actor *actor) {
 		// const RE::TESForm* 
 		auto equippedLi = aiProcess->high->attackData.get();
 		if (equippedLi) {
-			const RE::TESForm* equipped = equippedLi->IsLeftAttack() ? aiProcess->GetEquippedLeftHand() : aiProcess->GetEquippedRightHand();
+			IsLeftAttack = equippedLi->IsLeftAttack();
+			const RE::TESForm* equipped = IsLeftAttack ? aiProcess->GetEquippedLeftHand() : aiProcess->GetEquippedRightHand();
 			if (equipped && equipped->IsWeapon()) {
+
+				attack_speed = dodge::GetSingleton()->Get_Attack_Speed(actor, equipped->As<RE::TESObjectWEAP>(), IsLeftAttack);
+
 				switch (equipped->As<RE::TESObjectWEAP>()->GetWeaponType()) {
 				case RE::WEAPON_TYPE::kOneHandSword:
 					distance = 310.0f;
@@ -379,6 +385,7 @@ float dodge::Get_ReactiveDodge_Distance(RE::Actor *actor) {
 
 			} else if (equipped && equipped->IsArmor()) {
 				distance = 250.0f;
+				attack_speed = (actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kSpeedMult)/100.0f);
 
 			} else {
 				if (!Utils::Actor::isHumanoid(actor)) {
@@ -403,13 +410,63 @@ float dodge::Get_ReactiveDodge_Distance(RE::Actor *actor) {
 		}
 	}
 
-	return distance;
+	return { distance, attack_speed };
+}
+
+void dodge::retreive_execute_attacks(RE::Actor *a_actor, bool melee, bool melee_normal, bool ranged, bool bash, bool bash_sprint){
+
+	if (melee){
+		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
+		dodge::GetSingleton()->react_to_melee(a_actor, it.first, it.second);
+	}
+	if (melee_normal) {
+		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
+		dodge::GetSingleton()->react_to_melee_normal(a_actor, it.first, it.second);
+	}
+	if (ranged) {
+		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
+		dodge::GetSingleton()->react_to_ranged(a_actor, it.first, it.second);
+	}
+	if (bash) {
+		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
+		dodge::GetSingleton()->react_to_bash(a_actor, it.first);
+	}
+	if (bash_sprint) {
+		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
+		dodge::GetSingleton()->react_to_bash_sprint(a_actor, it.first, it.second);
+	}
 }
 
 float dodge::Get_ReactiveDodge_Reach(RE::Actor* actor)
 {
 	float reach = Actor_GetReach(actor);
 	return reach;
+}
+
+float dodge::Get_Attack_Speed(RE::Actor* actor, const RE::TESObjectWEAP* a_weapon, bool IsLeftAttack)
+{
+	float total_speed = 1.0f;
+	if (IsLeftAttack){
+		float av_speed = actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kLeftWeaponSpeedMultiply);
+		if (av_speed = 0.0f){
+			av_speed = 1.0f;
+		}
+		float weapon_speed = a_weapon->GetSpeed();
+
+		total_speed = av_speed * weapon_speed;
+
+	}else{
+
+		float av_speed = actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kWeaponSpeedMult);
+		if (av_speed = 0.0f) {
+			av_speed = 1.0f;
+		}
+		float weapon_speed = a_weapon->GetSpeed();
+
+		total_speed = av_speed * weapon_speed;
+	}
+
+	return total_speed;
 }
 
 bool dodge::GetAttackSpell(RE::Actor* actor, bool lefthand) {
@@ -466,9 +523,10 @@ bool dodge::GetAttackSpell(RE::Actor* actor, bool lefthand) {
 	return result;
 }
 
-bool dodge::GetAttackSpell_Alt(RE::SpellItem* a_spell)
+std::pair<bool, float> dodge::GetAttackSpell_Alt(RE::SpellItem* a_spell)
 {
 	bool result = false;
+	float time = 0.0f;
 	static auto fireKeyword = RE::TESForm::LookupByEditorID<RE::BGSKeyword>("MagicDamageFire");
 	static auto frostKeyword = RE::TESForm::LookupByEditorID<RE::BGSKeyword>("MagicDamageFrost");
 	static auto ShockKeyword = RE::TESForm::LookupByEditorID<RE::BGSKeyword>("MagicDamageShock");
@@ -487,12 +545,24 @@ bool dodge::GetAttackSpell_Alt(RE::SpellItem* a_spell)
 			}
 			continue;
 		}
+		for (auto Effect : Effect_List) {
+			if (Effect && Effect->baseEffect) {
+				if (Effect->baseEffect->data.projectileBase) {
+					float speed = Effect->baseEffect->data.projectileBase->data.speed;
+					if (speed && speed != 0.0f) {
+						time = 3000.0f / speed;
+						break;
+					}
+				}
+			}
+			continue;
+		}
 	}
 	catch(...)
 	{
-		return result;
+		return { result, time };
 	}
-	return result;
+	return { result, time };
 }
 
 bool dodge::GetEquippedShout(RE::Actor* actor){
@@ -610,6 +680,32 @@ float dodge::GetSpellRange_Reaction(RE::Actor* actor, float distance, bool lefth
 	return result;
 }
 
+bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
+{
+	float My_threat = 0.0f;
+	float Enemy_threat = 0.0f;
+	auto adequate_threat = false;
+
+	if (protagonist->GetActorRuntimeData().combatController) {
+		RE::CombatState* state = protagonist->GetActorRuntimeData().combatController->state;
+		if (state) {
+			My_threat += state->threatValue;
+		}
+	}
+	if (attacker->GetActorRuntimeData().combatController) {
+		RE::CombatState* state = attacker->GetActorRuntimeData().combatController->state;
+		if (state) {
+			Enemy_threat += state->threatValue;
+		}
+	}
+	if (My_threat > 0 && Enemy_threat > 0) {
+		//logger::info("Name {} TeamThreatLVL {}"sv, CTarget->GetName(), (MyTeam_total_threat / EnemyTeam_total_threat));
+		if ((My_threat / Enemy_threat) <= 0.625f) {
+			adequate_threat = true;
+		}
+	}
+	return adequate_threat;
+}
 
 void dodge::Set_iFrames(RE::Actor* actor){
 	actor->SetGraphVariableBool("bIframeActive", true);
@@ -648,7 +744,7 @@ bool dodge::getrace_VLserana(RE::Actor* a_actor)
 }
 
 /*Trigger reactive AI surrounding the attacker.*/
-void dodge::react_to_melee(RE::Actor* a_attacker, float attack_range)
+void dodge::react_to_melee(RE::Actor* a_attacker, float attack_range, float attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -695,10 +791,10 @@ void dodge::react_to_melee(RE::Actor* a_attacker, float attack_range)
 
 					switch (settings::iDodgeAI_Framework) {
 					case 0:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_reactive);
+						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
 						break;
 					}
 				}
@@ -758,7 +854,7 @@ void dodge::react_to_melee_power(RE::Actor* a_attacker, float attack_range)
 						dodge::GetSingleton()->Powerattack_attempt_dodge(refr, &dodge_directions_tk_reactive);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
 						break;
 					}
 				}
@@ -768,7 +864,7 @@ void dodge::react_to_melee_power(RE::Actor* a_attacker, float attack_range)
 	}
 }
 
-void dodge::react_to_melee_normal(RE::Actor* a_attacker, float attack_range)
+void dodge::react_to_melee_normal(RE::Actor* a_attacker, float attack_range, float attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -815,10 +911,10 @@ void dodge::react_to_melee_normal(RE::Actor* a_attacker, float attack_range)
 
 					switch (settings::iDodgeAI_Framework) {
 					case 0:
-						dodge::GetSingleton()->NormalAttack_attempt_dodge(refr, &dodge_directions_tk_reactive);
+						dodge::GetSingleton()->NormalAttack_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
 						break;
 					}
 				}
@@ -878,7 +974,7 @@ void dodge::react_to_bash(RE::Actor* a_attacker, float attack_range)
 						dodge::GetSingleton()->Bash_attempt_dodge(refr, &dodge_directions_tk_reactive);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
 						break;
 					}
 				}
@@ -888,7 +984,7 @@ void dodge::react_to_bash(RE::Actor* a_attacker, float attack_range)
 	}
 }
 
-void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range)
+void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, float mov_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -935,10 +1031,10 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range)
 
 					switch (settings::iDodgeAI_Framework) {
 					case 0:
-						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_reactive);
+						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_reactive, mov_speed);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
 						break;
 					}
 				}
@@ -948,7 +1044,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range)
 	}
 }
 
-void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range)
+void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -997,58 +1093,17 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range)
 					if (abs(angle) > attackAngle) {
 						continue;
 					}
-					int  bHeavyarmour = 0;
-					auto Body = refr->GetWornArmor(RE::BGSBipedObjectForm::BipedObjectSlot::kBody);
-					auto Helm = refr->GetWornArmor(RE::BGSBipedObjectForm::BipedObjectSlot::kHair);
-					auto Shield = refr->GetEquippedObject(true);
-					if (Body) {
-						switch (Body->GetArmorType()) {
-						case RE::BIPED_MODEL::ArmorType::kHeavyArmor:
-							bHeavyarmour += 1;
-							break;
-						case RE::BIPED_MODEL::ArmorType::kLightArmor:
-							bHeavyarmour += 0;
-							break;
-						case RE::BIPED_MODEL::ArmorType::kClothing:
-							bHeavyarmour += 0;
-							break;
-						}
-					} else {
-						bHeavyarmour += 0;
-					}
 
-					if (Helm) {
-						switch (Helm->GetArmorType()) {
-						case RE::BIPED_MODEL::ArmorType::kHeavyArmor:
-							bHeavyarmour += 1;
-							break;
-						case RE::BIPED_MODEL::ArmorType::kLightArmor:
-							bHeavyarmour += 0;
-							break;
-						case RE::BIPED_MODEL::ArmorType::kClothing:
-							bHeavyarmour += 0;
-							break;
-						}
-					} else {
-						bHeavyarmour += 0;
-					}
-
-					if (Shield && Shield->IsArmor()) {
-						bHeavyarmour += 1;
-					} else {
-						bHeavyarmour += 0;
+					if (!is_adequate_threat(refr, a_attacker)) {
+						continue;
 					}
 
 					switch (settings::iDodgeAI_Framework) {
 					case 0:
-						if (bHeavyarmour >= 2 && (refr->GetEquippedObject(false)->As<RE::TESObjectWEAP>()->IsMelee())) {
-							dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_ranged);
-						} else {
-							dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
-						}
+						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 						break;
 					}
 				}
@@ -1058,7 +1113,7 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range)
 	}
 }
 
-void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range)
+void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, float attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -1108,12 +1163,16 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range)
 						continue;
 					}
 
+					if (!is_adequate_threat(refr, a_attacker)){
+						continue;
+					}
+
 					switch (settings::iDodgeAI_Framework) {
 					case 0:
-						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive);
+						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 						break;
 					}
 
@@ -1127,7 +1186,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range)
 					// 		dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive);
 					// 		break;
 					// 	case 1:
-					// 		dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+					// // 		dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 					// 		break;
 					// 	}
 					// } else {
@@ -1136,7 +1195,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range)
 					// 		dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive);
 					// 		break;
 					// 	case 1:
-					// 		dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+					// // 		dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 					// 		break;
 					// 	}
 					// }
@@ -1202,7 +1261,7 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
 						break;
 					case 1:
-						dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 						break;
 					}
 
@@ -1217,7 +1276,7 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
 					// 			break;
 					// 		case 1:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 					// 			break;
 					// 		}
 					// 	} else {
@@ -1226,7 +1285,7 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
 					// 			break;
 					// 		case 1:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 					// 			break;
 					// 		}
 					// 	}
@@ -1241,7 +1300,7 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
 					// 			break;
 					// 		case 1:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 					// 			break;
 					// 		}
 					// 	}else{
@@ -1250,7 +1309,7 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
 					// 			break;
 					// 		case 1:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 					// 			break;
 					// 		}
 					// 	}
@@ -1338,7 +1397,7 @@ bool dodge::able_dodge(RE::Actor* a_actor)
 }
 
 /*Attempt to dodge an incoming threat, choosing one of the directions from A_DIRECTIONS.*/
-void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge)
+void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
 {
 	
     auto DS = dodge::GetSingleton();
@@ -1346,9 +1405,15 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 
 
 	std::mt19937 gen(rd());
-	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
-		return;
+
+	if (attack_speed > 0.0f) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance * attack_speed)) {
+			return;
+		}
+	} else {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+			return;
+		}
 	}
 
 	/* Make a copy and shuffle directions. */
@@ -1382,7 +1447,7 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 
 	std::mt19937 gen(rd());
 	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
+	if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
 		return;
 	}
 
@@ -1408,7 +1473,7 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 	}
 }
 
-void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge)
+void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
 {
     auto DS = dodge::GetSingleton();
 	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
@@ -1416,9 +1481,15 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 	
 
 	std::mt19937 gen(rd());
-	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
-		return;
+
+	if (attack_speed > 0.0f) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance * attack_speed)) {
+			return;
+		}
+	} else {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+			return;
+		}
 	}
 
 	/* Make a copy and shuffle directions. */
@@ -1443,7 +1514,7 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 	}
 }
 
-void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge)
+void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
 {
 
 	auto DS = dodge::GetSingleton();
@@ -1452,9 +1523,15 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 	
 
 	std::mt19937 gen(rd());
-	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
-		return;
+
+	if (attack_speed > 0.0f){
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance * attack_speed)) {
+			return;
+		}
+	}else{
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+			return;
+		}
 	}
 
 	/* Make a copy and shuffle directions. */
@@ -1488,7 +1565,7 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 
 	std::mt19937 gen(rd());
 	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
+	if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
 		return;
 	}
 
@@ -1514,7 +1591,7 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 	}
 }
 
-void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge)
+void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float mov_speed, bool a_forceDodge)
 {
 
     auto DS = dodge::GetSingleton();
@@ -1523,9 +1600,15 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 	
 
 	std::mt19937 gen(rd());
-	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
-		return;
+
+	if (mov_speed > 0.0f) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance * mov_speed)) {
+			return;
+		}
+	} else {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+			return;
+		}
 	}
 
 	/* Make a copy and shuffle directions. */
