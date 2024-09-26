@@ -694,7 +694,9 @@ bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 		}
 	}
 	if (My_threat > 0 && Enemy_threat > 0) {
-		logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (My_threat / Enemy_threat));
+		if (settings::bThreatlogging_enable) {
+			logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (My_threat / Enemy_threat));
+		}
 		if ((My_threat / Enemy_threat) <= 0.625f) {
 			adequate_threat = true;
 		}
@@ -722,7 +724,9 @@ void dodge::send_UNDdodge__event(RE::Actor* a_actor)
 	};
 
 	SKSE::GetModCallbackEventSource()->SendEvent(&modEvent);
-	logger::info("Sent UND dodge event");
+	if (settings::bCombatlogging_enable) {
+		logger::info("Sent UND dodge event");
+	}
 }
 
 bool dodge::getrace_VLserana(RE::Actor* a_actor)
@@ -1420,12 +1424,16 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 		if (can_goto(a_actor, dodge_dest) && able_dodge(a_actor)) {
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
-				logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+				if (settings::bCombatlogging_enable) {
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/attack_speed));
+				}
 			}else{
 				bool bIsDodging = false;
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
-					logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+					if (settings::bCombatlogging_enable) {
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/attack_speed));
+					}
 				}
 			}
 			break;
@@ -1455,12 +1463,16 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 		if (can_goto(a_actor, dodge_dest) && able_dodge(a_actor)) {
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
-				logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+				if (settings::bCombatlogging_enable) {
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
+				}
 			}else{
 				bool bIsDodging = false;
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
-					logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+					if (settings::bCombatlogging_enable) {
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
+					}
 				}
 			}
 			break;
@@ -1496,12 +1508,17 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 		if (can_goto(a_actor, dodge_dest) && able_dodge(a_actor)) {
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
-				logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+				if (settings::bCombatlogging_enable){
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/attack_speed));
+				}
+				
 			}else{
 				bool bIsDodging = false;
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
-					logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+					if (settings::bCombatlogging_enable) {
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance / attack_speed));
+					}
 				}
 			}
 			break;
@@ -1538,12 +1555,16 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 		if (can_goto(a_actor, dodge_dest) && able_dodge(a_actor)) {
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
-				logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+				if (settings::bCombatlogging_enable) {
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance * attack_speed));
+				}
 			}else{
 				bool bIsDodging = false;
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
-					logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+					if (settings::bCombatlogging_enable) {
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance * attack_speed));
+					}
 				}
 			}
 			break;
@@ -1573,12 +1594,16 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 		if (can_goto(a_actor, dodge_dest) && able_dodge(a_actor)) {
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
-				logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+				if (settings::bCombatlogging_enable) {
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
+				}
 			}else{
 				bool bIsDodging = false;
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
-					logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+					if (settings::bCombatlogging_enable) {
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
+					}
 				}
 			}
 			break;
@@ -1615,12 +1640,16 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 		if (can_goto(a_actor, dodge_dest) && able_dodge(a_actor)) {
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
-				logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+				if (settings::bCombatlogging_enable) {
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/mov_speed));
+				}
 			}else{
 				bool bIsDodging = false;
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
-					logger::info("Protagnist {} ReflexScore {}"sv, a_actor->GetName(), dodge_chance);
+					if (settings::bCombatlogging_enable) {
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/mov_speed));
+					}
 				}
 			}
 			break;

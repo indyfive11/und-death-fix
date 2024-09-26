@@ -31,6 +31,8 @@ void settings::read(const wchar_t* a_path)
 
 	bZUPA_mod_Check = ini.GetBoolValue("General", "bZUPA_mod_Check", bZUPA_mod_Check);
 	bUAPNG_mod_Check = ini.GetBoolValue("General", "bUAPNG_mod_Check", bUAPNG_mod_Check);
+	bCombatlogging_enable = ini.GetBoolValue("General", "bCombatlogging_enable", bCombatlogging_enable);
+	bThreatlogging_enable = ini.GetBoolValue("General", "bThreatlogging_enable", bThreatlogging_enable);
 
 	DS->Protagnist_Reflexess.Armour_Weighting = static_cast<float>(ini.GetDoubleValue("Protagnist_Reflexes", "Armour_Weighting", DS->Protagnist_Reflexess.Armour_Weighting));
 	DS->Protagnist_Reflexess.Defensive_Weighting = static_cast<float>(ini.GetDoubleValue("Protagnist_Reflexes", "Defensive_Weighting", DS->Protagnist_Reflexess.Defensive_Weighting));
