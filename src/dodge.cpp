@@ -414,25 +414,20 @@ std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
 }
 
 void dodge::retreive_execute_attacks(RE::Actor *a_actor, bool melee, bool melee_normal, bool ranged, bool bash, bool bash_sprint){
-
+	auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
 	if (melee){
-		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
 		dodge::GetSingleton()->react_to_melee(a_actor, it.first, it.second);
 	}
 	if (melee_normal) {
-		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
 		dodge::GetSingleton()->react_to_melee_normal(a_actor, it.first, it.second);
 	}
 	if (ranged) {
-		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
 		dodge::GetSingleton()->react_to_ranged(a_actor, it.first, it.second);
 	}
 	if (bash) {
-		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
 		dodge::GetSingleton()->react_to_bash(a_actor, it.first);
 	}
 	if (bash_sprint) {
-		auto it = dodge::GetSingleton()->Get_ReactiveDodge_Distance(a_actor);
 		dodge::GetSingleton()->react_to_bash_sprint(a_actor, it.first, it.second);
 	}
 }
