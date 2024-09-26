@@ -443,7 +443,7 @@ float dodge::Get_Attack_Speed(RE::Actor* actor, const RE::TESObjectWEAP* a_weapo
 	float total_speed = 1.0f;
 	if (IsLeftAttack){
 		float av_speed = actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kLeftWeaponSpeedMultiply);
-		if (av_speed = 0.0f){
+		if (av_speed == 0.0f){
 			av_speed = 1.0f;
 		}
 		float weapon_speed = a_weapon->GetSpeed();
@@ -453,7 +453,7 @@ float dodge::Get_Attack_Speed(RE::Actor* actor, const RE::TESObjectWEAP* a_weapo
 	}else{
 
 		float av_speed = actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kWeaponSpeedMult);
-		if (av_speed = 0.0f) {
+		if (av_speed == 0.0f) {
 			av_speed = 1.0f;
 		}
 		float weapon_speed = a_weapon->GetSpeed();
