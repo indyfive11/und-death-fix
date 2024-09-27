@@ -160,6 +160,7 @@ public:
 	static bool getrace_VLserana(RE::Actor *a_actor);
 	static bool is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker);
 	static void retreive_execute_attacks(RE::Actor *a_actor, bool melee = false, bool melee_normal = false, bool ranged = false, bool bash = false, bool bash_sprint = false);
+	static bool is_melee(RE::Actor *actor);
 
 private:
 

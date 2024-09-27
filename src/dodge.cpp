@@ -325,6 +325,21 @@ float dodge::get_stamina_basecost(RE::Actor* a_actor, const Stamina_factors& Sta
 	}
 }
 
+bool dodge::is_melee(RE::Actor* actor)
+{
+	bool result = false;
+	auto aiProcess = actor->GetActorRuntimeData().currentProcess;
+	if (aiProcess){
+		if (aiProcess->GetEquippedLeftHand() && aiProcess->GetEquippedLeftHand()->IsWeapon() && aiProcess->GetEquippedLeftHand()->As<RE::TESObjectWEAP>()->IsMelee()){
+			result = true;
+		}
+		if (aiProcess->GetEquippedRightHand() && aiProcess->GetEquippedRightHand()->IsWeapon() && aiProcess->GetEquippedRightHand()->As<RE::TESObjectWEAP>()->IsMelee()){
+			result = true;
+		}
+	}
+	return result;
+}
+
 std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
 {
 	float distance = 200.0f;
@@ -1102,9 +1117,7 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float att
 					}
 
 					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 350.0f 
-					&& ((refr->GetEquippedObject(false)->As<RE::TESObjectWEAP>()->IsMelee()) 
-					|| (refr->GetEquippedObject(true)->As<RE::TESObjectWEAP>()->IsMelee())) 
-					&& !is_adequate_threat(refr, a_attacker)){
+					&& dodge::is_melee(refr) && !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
 
@@ -1174,9 +1187,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					}
 
 					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 350.0f 
-					&& ((refr->GetEquippedObject(false)->As<RE::TESObjectWEAP>()->IsMelee()) 
-					|| (refr->GetEquippedObject(true)->As<RE::TESObjectWEAP>()->IsMelee())) 
-					&& !is_adequate_threat(refr, a_attacker)){
+					&& dodge::is_melee(refr) && !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
 
