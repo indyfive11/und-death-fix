@@ -681,26 +681,34 @@ bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 	float Enemy_threat = 0.0f;
 	auto adequate_threat = false;
 
-	if (protagonist->GetActorRuntimeData().combatController) {
-		RE::CombatState* state = protagonist->GetActorRuntimeData().combatController->state;
-		if (state) {
-			My_threat += state->threatValue;
+	try
+	{
+		if (protagonist->GetActorRuntimeData().combatController) {
+			RE::CombatState* state = protagonist->GetActorRuntimeData().combatController->state;
+			if (state) {
+				My_threat += state->threatValue;
+			}
+		}
+		if (attacker->GetActorRuntimeData().combatController) {
+			RE::CombatState* state = attacker->GetActorRuntimeData().combatController->state;
+			if (state) {
+				Enemy_threat += state->threatValue;
+			}
+		}
+		if (My_threat > 0 && Enemy_threat > 0) {
+			if (settings::bThreatlogging_enable) {
+				logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (My_threat / Enemy_threat));
+			}
+			if ((My_threat / Enemy_threat) <= 0.625f) {
+				adequate_threat = true;
+			}
 		}
 	}
-	if (attacker->GetActorRuntimeData().combatController) {
-		RE::CombatState* state = attacker->GetActorRuntimeData().combatController->state;
-		if (state) {
-			Enemy_threat += state->threatValue;
-		}
+	catch(...)
+	{
+		return adequate_threat;
 	}
-	if (My_threat > 0 && Enemy_threat > 0) {
-		if (settings::bThreatlogging_enable) {
-			logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (My_threat / Enemy_threat));
-		}
-		if ((My_threat / Enemy_threat) <= 0.625f) {
-			adequate_threat = true;
-		}
-	}
+	
 	return adequate_threat;
 }
 
