@@ -325,19 +325,65 @@ float dodge::get_stamina_basecost(RE::Actor* a_actor, const Stamina_factors& Sta
 	}
 }
 
-bool dodge::is_melee(RE::Actor* actor)
+std::vector<RE::TESForm*> dodge::GetEquippedForm(RE::Actor* actor)
+{
+	std::vector<RE::TESForm*> Hen;
+
+	if (actor->GetEquippedObject(true)){
+		Hen.push_back(actor->GetEquippedObject(true));
+	}
+	if (actor->GetEquippedObject(false)){
+		Hen.push_back(actor->GetEquippedObject(false));
+	}
+
+	return Hen;
+}
+
+bool dodge::GetEquippedType_IsMelee(RE::Actor* actor)
 {
 	bool result = false;
-	auto aiProcess = actor->GetActorRuntimeData().currentProcess;
-	if (aiProcess){
-		if (aiProcess->GetEquippedLeftHand() && aiProcess->GetEquippedLeftHand()->IsWeapon() && aiProcess->GetEquippedLeftHand()->As<RE::TESObjectWEAP>()->IsMelee()){
-			result = true;
+
+	auto form_list = GetEquippedForm(actor);
+
+	for (auto form : form_list)
+	{
+		switch (*form->formType){
+		case RE::FormType::Weapon:
+			if (const auto equippedWeapon = form->As<RE::TESObjectWEAP>()) {
+				switch (equippedWeapon->GetWeaponType()) {
+				case RE::WEAPON_TYPE::kHandToHandMelee:
+				case RE::WEAPON_TYPE::kOneHandSword:
+				case RE::WEAPON_TYPE::kOneHandDagger:
+				case RE::WEAPON_TYPE::kOneHandAxe:
+				case RE::WEAPON_TYPE::kOneHandMace:
+				case RE::WEAPON_TYPE::kTwoHandSword:
+				case RE::WEAPON_TYPE::kTwoHandAxe:
+					result = true;
+					break;
+				default:
+					break;
+				}
+			}
+			break;
+		case RE::FormType::Armor:
+			if (auto equippedShield = form->As<RE::TESObjectARMO>()) {
+				result = true;
+			}
+			break;
+		default:
+		    break;
 		}
-		if (aiProcess->GetEquippedRightHand() && aiProcess->GetEquippedRightHand()->IsWeapon() && aiProcess->GetEquippedRightHand()->As<RE::TESObjectWEAP>()->IsMelee()){
-			result = true;
+		if (result){
+			break;
 		}
+		continue;
 	}
+	
 	return result;
+}
+
+bool dodge::is_melee(RE::Actor* actor){
+	return GetEquippedType_IsMelee(actor);
 }
 
 std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
