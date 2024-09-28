@@ -342,43 +342,44 @@ std::vector<RE::TESForm*> dodge::GetEquippedForm(RE::Actor* actor)
 bool dodge::GetEquippedType_IsMelee(RE::Actor* actor)
 {
 	bool result = false;
-
 	auto form_list = GetEquippedForm(actor);
 
-	for (auto form : form_list)
-	{
-		switch (*form->formType){
-		case RE::FormType::Weapon:
-			if (const auto equippedWeapon = form->As<RE::TESObjectWEAP>()) {
-				switch (equippedWeapon->GetWeaponType()) {
-				case RE::WEAPON_TYPE::kHandToHandMelee:
-				case RE::WEAPON_TYPE::kOneHandSword:
-				case RE::WEAPON_TYPE::kOneHandDagger:
-				case RE::WEAPON_TYPE::kOneHandAxe:
-				case RE::WEAPON_TYPE::kOneHandMace:
-				case RE::WEAPON_TYPE::kTwoHandSword:
-				case RE::WEAPON_TYPE::kTwoHandAxe:
-					result = true;
+	if (!form_list.empty()){
+		for (auto form : form_list) {
+			if (form){
+				switch (*form->formType) {
+				case RE::FormType::Weapon:
+					if (const auto equippedWeapon = form->As<RE::TESObjectWEAP>()) {
+						switch (equippedWeapon->GetWeaponType()) {
+						case RE::WEAPON_TYPE::kHandToHandMelee:
+						case RE::WEAPON_TYPE::kOneHandSword:
+						case RE::WEAPON_TYPE::kOneHandDagger:
+						case RE::WEAPON_TYPE::kOneHandAxe:
+						case RE::WEAPON_TYPE::kOneHandMace:
+						case RE::WEAPON_TYPE::kTwoHandSword:
+						case RE::WEAPON_TYPE::kTwoHandAxe:
+							result = true;
+							break;
+						default:
+							break;
+						}
+					}
+					break;
+				case RE::FormType::Armor:
+					if (auto equippedShield = form->As<RE::TESObjectARMO>()) {
+						result = true;
+					}
 					break;
 				default:
 					break;
 				}
+				if (result) {
+					break;
+				}
 			}
-			break;
-		case RE::FormType::Armor:
-			if (auto equippedShield = form->As<RE::TESObjectARMO>()) {
-				result = true;
-			}
-			break;
-		default:
-		    break;
+			continue;
 		}
-		if (result){
-			break;
-		}
-		continue;
 	}
-	
 	return result;
 }
 
