@@ -747,13 +747,13 @@ bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 	{
 		if (protagonist->GetActorRuntimeData().combatController) {
 			RE::CombatState* state = protagonist->GetActorRuntimeData().combatController->state;
-			if (state) {
+			if (state && state->threatValue) {
 				My_threat += state->threatValue;
 			}
 		}
 		if (attacker->GetActorRuntimeData().combatController) {
 			RE::CombatState* state = attacker->GetActorRuntimeData().combatController->state;
-			if (state) {
+			if (state && state->threatValue) {
 				Enemy_threat += state->threatValue;
 			}
 		}
