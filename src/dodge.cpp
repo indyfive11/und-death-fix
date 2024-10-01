@@ -739,40 +739,43 @@ float dodge::GetSpellRange_Reaction(RE::Actor* actor, float distance, bool lefth
 
 bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 {
-	float My_threat = 0.0f;
-	float Enemy_threat = 0.0f;
 	auto adequate_threat = false;
+	float protagonist_threat = 0.0f;
+	float attacker_threat = 0.0f;
 
-	try
-	{
-		if (protagonist->GetActorRuntimeData().combatController) {
-			RE::CombatState* state = protagonist->GetActorRuntimeData().combatController->state;
-			if (state && state->threatValue) {
-				My_threat += state->threatValue;
+	auto combatGroup = protagonist->GetCombatGroup();
+	if (combatGroup) {
+		for (auto it = combatGroup->members.begin(); it != combatGroup->members.end(); ++it) {
+			if (it->memberHandle && it->memberHandle.get().get() && it->memberHandle.get().get() == protagonist) {
+				protagonist_threat += it->threatValue;
+				break;
 			}
+			continue;
 		}
-		if (attacker->GetActorRuntimeData().combatController) {
-			RE::CombatState* state = attacker->GetActorRuntimeData().combatController->state;
-			if (state && state->threatValue) {
-				Enemy_threat += state->threatValue;
+	}
+	auto EnemyGroup = attacker->GetCombatGroup();
+	if (EnemyGroup) {
+		for (auto it = EnemyGroup->members.begin(); it != EnemyGroup->members.end(); ++it) {
+			if (it->memberHandle && it->memberHandle.get().get() && it->memberHandle.get().get() == attacker) {
+				attacker_threat += it->threatValue;
+				break;
 			}
+			continue;
 		}
-		if (My_threat > 0 && Enemy_threat > 0) {
-			if (settings::bThreatlogging_enable) {
-				logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (My_threat / Enemy_threat));
-			}
-			if ((My_threat / Enemy_threat) < protagonist->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence)) {
+	}
+
+	if (protagonist_threat > 0 && attacker_threat > 0) {
+		if (settings::bThreatlogging_enable) {
+			logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (protagonist_threat / attacker_threat));
+			if ((protagonist_threat / attacker_threat) < protagonist->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence)) {
 				adequate_threat = true;
 			}
 		}
 	}
-	catch(...)
-	{
-		return adequate_threat;
-	}
-	
+
 	return adequate_threat;
 }
+
 
 void dodge::Set_iFrames(RE::Actor* actor){
 	actor->SetGraphVariableBool("bIframeActive", true);
