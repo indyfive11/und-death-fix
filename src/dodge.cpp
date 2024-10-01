@@ -767,9 +767,9 @@ bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 	if (protagonist_threat > 0 && attacker_threat > 0) {
 		if (settings::bThreatlogging_enable) {
 			logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (protagonist_threat / attacker_threat));
-			if ((protagonist_threat / attacker_threat) < protagonist->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence)) {
-				adequate_threat = true;
-			}
+		}
+		if ((protagonist_threat / attacker_threat) < protagonist->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence)) {
+			adequate_threat = true;
 		}
 	}
 
