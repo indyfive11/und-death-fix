@@ -1166,7 +1166,7 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float att
 						continue;
 					}
 
-					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 350.0f 
+					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 512.0f 
 					&& dodge::is_melee(refr) && !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
@@ -1236,7 +1236,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 
-					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 350.0f 
+					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 512.0f 
 					&& dodge::is_melee(refr) && !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
