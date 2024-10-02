@@ -387,6 +387,40 @@ bool dodge::is_melee(RE::Actor* actor){
 	return GetEquippedType_IsMelee(actor);
 }
 
+float dodge::confidence_threshold(RE::Actor* a_actor)
+{
+	float result = 0.0f;
+
+	switch (static_cast<int>(a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence)))
+	{
+	case 0:
+		result = 1.25f;
+		break;
+
+	case 1:
+		result = 1.0f;
+		break;
+
+	case 2:
+		result = 0.75f;
+		break;
+
+	case 3:
+		result = 0.5f;
+		break;
+
+	case 4:
+		result = 0.25f;
+		break;
+
+	default:
+		break;
+	}
+
+	return result;
+	
+}
+
 std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
 {
 	float distance = 200.0f;
@@ -768,7 +802,7 @@ bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 		if (settings::bThreatlogging_enable) {
 			logger::info("Name {} RSS_foe_threat {}"sv, protagonist->GetName(), (protagonist_threat / attacker_threat));
 		}
-		if ((protagonist_threat / attacker_threat) < protagonist->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence)) {
+		if ((protagonist_threat / attacker_threat) < dodge::GetSingleton()->confidence_threshold(protagonist)) {
 			adequate_threat = true;
 		}
 	}

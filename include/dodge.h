@@ -163,6 +163,7 @@ public:
 	static bool is_melee(RE::Actor *actor);
 	static std::vector<RE::TESForm *> GetEquippedForm(RE::Actor *actor);
 	static bool GetEquippedType_IsMelee(RE::Actor *actor);
+	float confidence_threshold(RE::Actor *a_actor);
 
 private:
 
