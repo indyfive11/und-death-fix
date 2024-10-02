@@ -1455,6 +1455,15 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 //	
 //}
 
+void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
+{
+	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
+		auto bPGC_IsInCombat = false;
+		if (a_actor->GetGraphVariableBool("bPGC_IsInCombat", bPGC_IsInCombat) && bPGC_IsInCombat) {
+			
+		} 
+	}
+}
 
 /*Check if the actor is able to dodge.*/
 bool dodge::able_dodge(RE::Actor* a_actor)

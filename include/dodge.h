@@ -8,6 +8,8 @@
 using PRECISION_API::PreHitCallback;
 using std::string;
 
+static float& g_deltaTime = (*(float*)RELOCATION_ID(523660, 410199).address());
+
 enum dodge_direction
 {
 	kForward = 1,
@@ -164,6 +166,12 @@ public:
 	static std::vector<RE::TESForm *> GetEquippedForm(RE::Actor *actor);
 	static bool GetEquippedType_IsMelee(RE::Actor *actor);
 	float confidence_threshold(RE::Actor *a_actor);
+	void Update(RE::Actor* a_actor, float a_delta);
+
+	static void install_protected()
+	{
+		Install_Update();
+	}
 
 private:
 
@@ -183,5 +191,20 @@ private:
 
 	//std::unordered_set<RE::ActorHandle> dodging_actors;
 	//mutable std::shared_mutex dodging_actors_lock;
-	
+
+protected:
+	struct Actor_Update
+	{
+		static void thunk(RE::Actor* a_actor, float a_delta)
+		{
+			func(a_actor, a_delta);
+			GetSingleton()->Update(a_actor, g_deltaTime);
+		}
+		static inline REL::Relocation<decltype(thunk)> func;
+	};
+
+	static void Install_Update()
+	{
+		stl::write_vfunc<RE::Character, 0xAD, Actor_Update>();
+	}
 };
