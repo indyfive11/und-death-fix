@@ -1535,8 +1535,8 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-					logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-					logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					
 				}
 			}else{
 				bool bIsDodging = false;
@@ -1544,8 +1544,8 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-						logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-						logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						
 					}
 				}
 			}
@@ -1578,8 +1578,8 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-					logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-					logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					
 				}
 			}else{
 				bool bIsDodging = false;
@@ -1587,8 +1587,8 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-						logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-						logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						
 					}
 				}
 			}
@@ -1627,8 +1627,8 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable){
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-					logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-					logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					
 				}
 				
 			}else{
@@ -1637,8 +1637,8 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-						logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-						logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						
 					}
 				}
 			}
@@ -1678,8 +1678,8 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance * attack_speed));
-					logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-					logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					
 				}
 			}else{
 				bool bIsDodging = false;
@@ -1687,8 +1687,8 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance * attack_speed));
-						logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-						logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						
 					}
 				}
 			}
@@ -1721,8 +1721,8 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-					logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-					logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					
 				}
 			}else{
 				bool bIsDodging = false;
@@ -1730,8 +1730,8 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-						logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-						logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						
 					}
 				}
 			}
@@ -1771,8 +1771,8 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0f)));
-					logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-					logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					
 				}
 			}else{
 				bool bIsDodging = false;
@@ -1780,8 +1780,8 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0f)));
-						logger::info("Name {} Confidence {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kConfidence));
-						logger::info("Name {} Aggression {}"sv, a_actor->GetName(), a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression));
+						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						
 					}
 				}
 			}
