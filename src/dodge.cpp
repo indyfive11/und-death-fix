@@ -424,7 +424,7 @@ float dodge::confidence_threshold(RE::Actor* a_actor)
 std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
 {
 	float distance = 200.0f;
-	float attack_speed = 0.0f;
+	double attack_speed = 0.0f;
 	bool IsLeftAttack = false;
 	
 	auto aiProcess = actor->GetActorRuntimeData().currentProcess;
@@ -852,7 +852,7 @@ bool dodge::getrace_VLserana(RE::Actor* a_actor)
 }
 
 /*Trigger reactive AI surrounding the attacker.*/
-void dodge::react_to_melee(RE::Actor* a_attacker, float attack_range, float attack_speed)
+void dodge::react_to_melee(RE::Actor* a_attacker, float attack_range, double attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -972,7 +972,7 @@ void dodge::react_to_melee_power(RE::Actor* a_attacker, float attack_range)
 	}
 }
 
-void dodge::react_to_melee_normal(RE::Actor* a_attacker, float attack_range, float attack_speed)
+void dodge::react_to_melee_normal(RE::Actor* a_attacker, float attack_range, double attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -1092,7 +1092,7 @@ void dodge::react_to_bash(RE::Actor* a_attacker, float attack_range)
 	}
 }
 
-void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, float mov_speed)
+void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, double mov_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -1146,7 +1146,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 					auto time = distance/mov_speed;
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", dodge::GetSingleton()->GenerateRandomFloat(0.0f, time / 100.0f));
+					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", dodge::GetSingleton()->GenerateRandomFloat(0.0, time / 100.0));
 					refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
 					refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
@@ -1157,7 +1157,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 	}
 }
 
-void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float attack_speed)
+void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, double attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -1227,7 +1227,7 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float att
 	}
 }
 
-void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, float attack_speed)
+void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, double attack_speed)
 {
 	if (!settings::bDodgeAI_Reactive_enable) {
 		return;
@@ -1288,10 +1288,10 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 					//3000.0f / (speed * 2.0f);
-					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
-					auto time = distance/attack_speed;
+					double distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
+					double time = distance/attack_speed;
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", dodge::GetSingleton()->GenerateRandomFloat(0.0f, time / 100.0f));
+					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", dodge::GetSingleton()->GenerateRandomFloat(0.0, time / 100.0));
 					refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
 					refr->SetGraphVariableBool("bUND_Update_spell", true);
@@ -1496,21 +1496,21 @@ bool dodge::able_dodge(RE::Actor* a_actor)
 }
 
 /*Attempt to dodge an incoming threat, choosing one of the directions from A_DIRECTIONS.*/
-void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
+void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double attack_speed, bool a_forceDodge)
 {
 	
     auto DS = dodge::GetSingleton();
-	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
+	double dodge_chance = a_forceDodge ? 1.0 : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 
 
 	std::mt19937 gen(rd());
 
 	if (attack_speed > 0.0f) {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance/(attack_speed * 2.0f))) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > (dodge_chance/(attack_speed * 2.0))) {
 			return;
 		}
 	} else {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
 			return;
 		}
 	}
@@ -1525,7 +1525,7 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
-					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0)));
 					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
@@ -1534,7 +1534,7 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
-						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0)));
 						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
@@ -1548,13 +1548,13 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge)
 {
     auto DS = dodge::GetSingleton();
-	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
+	double dodge_chance = a_forceDodge ? 1.0 : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 
 	
 
 	std::mt19937 gen(rd());
 	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
 		return;
 	}
 
@@ -1588,21 +1588,21 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 	}
 }
 
-void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
+void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double attack_speed, bool a_forceDodge)
 {
     auto DS = dodge::GetSingleton();
-	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
+	double dodge_chance = a_forceDodge ? 1.0 : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 
 	
 
 	std::mt19937 gen(rd());
 
 	if (attack_speed > 0.0f) {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance/(attack_speed * 2.0f))) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > (dodge_chance/(attack_speed * 2.0))) {
 			return;
 		}
 	} else {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
 			return;
 		}
 	}
@@ -1617,7 +1617,7 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable){
-					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0)));
 					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
@@ -1627,7 +1627,7 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
-						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0)));
 						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
@@ -1638,23 +1638,23 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 	}
 }
 
-void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
+void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double attack_speed, bool a_forceDodge)
 {
 	a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
 
 	auto DS = dodge::GetSingleton();
-	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
+	double dodge_chance = a_forceDodge ? 1.0 : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 
 	
 
 	std::mt19937 gen(rd());
 
 	if (attack_speed > 0.0f){
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance/(attack_speed * 2.0f))) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > (dodge_chance/(attack_speed * 2.0))) {
 			return;
 		}
 	}else{
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
 			return;
 		}
 	}
@@ -1669,7 +1669,7 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
-					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0)));
 					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
@@ -1678,7 +1678,7 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
-						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0)));
 						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
@@ -1692,13 +1692,13 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge)
 {
     auto DS = dodge::GetSingleton();
-	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
+	double dodge_chance = a_forceDodge ? 1.0 : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 
 	
 
 	std::mt19937 gen(rd());
 	
-	if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+	if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
 		return;
 	}
 
@@ -1732,23 +1732,23 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 	}
 }
 
-void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float mov_speed, bool a_forceDodge)
+void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double mov_speed, bool a_forceDodge)
 {
 	a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
 
 	auto DS = dodge::GetSingleton();
-	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
+	double dodge_chance = a_forceDodge ? 1.0 : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 
 	
 
 	std::mt19937 gen(rd());
 
 	if (mov_speed > 0.0f) {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (dodge_chance/(mov_speed * 2.0f))) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > (dodge_chance/(mov_speed * 2.0))) {
 			return;
 		}
 	} else {
-		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > dodge_chance) {
+		if (dodge::GetSingleton()->GenerateRandomFloat(0.0, 1.0) > dodge_chance) {
 			return;
 		}
 	}
@@ -1763,7 +1763,7 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 			if (getrace_VLserana(a_actor)) {
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
-					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0f)));
+					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0)));
 					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
@@ -1772,7 +1772,7 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 				if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
-						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0f)));
+						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0)));
 						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}

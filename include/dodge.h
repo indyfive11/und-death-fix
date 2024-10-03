@@ -118,13 +118,13 @@ public:
 	float get_dodge_chance(RE::Actor* a_actor, const Armour_factors& Armour, const PReflex_factors& Protagnist_Reflexes, const CStyle_factors& CStyle);
 	float get_stamina_basecost(RE::Actor* a_actor, const Stamina_factors& Stamina, bool DodgeRoll = false);
 
-	void react_to_melee(RE::Actor* a_attacker, float attack_range, float attack_speed);
+	void react_to_melee(RE::Actor* a_attacker, float attack_range, double attack_speed);
 	void react_to_melee_power(RE::Actor* a_attacker, float attack_range);
-	void react_to_melee_normal(RE::Actor* a_attacker, float attack_range, float attack_speed);
+	void react_to_melee_normal(RE::Actor* a_attacker, float attack_range, double attack_speed);
 	void react_to_bash(RE::Actor* a_attacker, float attack_range);
-	void react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, float mov_speed);
-	void react_to_ranged(RE::Actor* a_attacker, float attack_range, float attack_speed);
-	void react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, float attack_speed);
+	void react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, double mov_speed);
+	void react_to_ranged(RE::Actor* a_attacker, float attack_range, double attack_speed);
+	void react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, double attack_speed);
 	void react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_range, bool lefthand = false);
 
 
@@ -137,12 +137,12 @@ public:
 	int GenerateRandomInt(int value_a, int value_b);
 	float GenerateRandomFloat(float value_a, float value_b);
 
-	void attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed = 0.0f, bool a_forceDodge = false);
+	void attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double attack_speed = 0.0f, bool a_forceDodge = false);
 	void Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge = false);
-	void NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge = false);
-	void Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge = false);
+	void NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double attack_speed, bool a_forceDodge = false);
+	void Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double attack_speed, bool a_forceDodge = false);
 	void Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, bool a_forceDodge = false);
-	void BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float mov_speed, bool a_forceDodge = false);
+	void BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, double mov_speed, bool a_forceDodge = false);
 
 	static void Set_iFrames(RE::Actor* actor);
 	static void Reset_iFrames(RE::Actor* actor);
