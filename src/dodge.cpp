@@ -1402,10 +1402,6 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
 		auto bUND_Update = false;
 		if (a_actor->GetGraphVariableBool("bUND_Update", bUND_Update) && bUND_Update) {
-			bool bIsDodging = false;
-			if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
-				a_actor->SetGraphVariableBool("bIsDodging", true);
-			}
 			float fUND_Update_time_required = 0.0f;
 			float fUND_Update_time_counter = 0.0f;
 			float fUND_Update_attackSpeed = 0.0f;
@@ -1413,16 +1409,15 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 			a_actor->GetGraphVariableFloat("fUND_Update_time_counter", fUND_Update_time_counter);
 			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed", fUND_Update_attackSpeed);
 
-			logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter);
 			logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required);
+			auto counter = fUND_Update_time_counter += g_deltaTime;
+			a_actor->SetGraphVariableFloat("fUND_Update_time_counter", counter);
+			logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter);
 
-			fUND_Update_time_counter += g_deltaTime;
-
-			if (fUND_Update_time_counter >= fUND_Update_time_required){
+			if (counter >= fUND_Update_time_required){
 				int iUND_dodge_type = 0;
 				a_actor->GetGraphVariableInt("iUND_dodge_type", iUND_dodge_type);
 				a_actor->SetGraphVariableBool("bUND_Update", false);
-				a_actor->SetGraphVariableBool("bIsDodging", false);
 				logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed);
 				logger::info("Name {} dodgetype {}"sv, a_actor->GetName(), iUND_dodge_type);
 
