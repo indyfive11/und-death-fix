@@ -1135,7 +1135,11 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						continue;
 					}
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required", mov_speed * 0.75f);
+					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
+
+					auto time = (distance/(mov_speed * 2.0f)) * 1.5f;
+
+					refr->SetGraphVariableFloat("fUND_Update_time_required", time);
 					refr->SetGraphVariableFloat("fUND_Update_time_counter", 0.0f);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed", mov_speed);
 					refr->SetGraphVariableInt("iUND_dodge_type", 2);
@@ -1426,13 +1430,11 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 					} else {
 						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed);
 					}
-					a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
 					break;
 
 				case 2:
 					/* bash sprint */
 					dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed);
-					a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
 					break;
 
 				default:
@@ -1522,7 +1524,7 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
 			}else{
@@ -1531,7 +1533,7 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
 				}
@@ -1565,7 +1567,7 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
 			}else{
@@ -1574,7 +1576,7 @@ void dodge::Powerattack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
 				}
@@ -1614,7 +1616,7 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable){
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
 				
@@ -1624,7 +1626,7 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(attack_speed * 2.0f)));
-						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
 				}
@@ -1636,6 +1638,7 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 
 void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
 {
+	a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
 
 	auto DS = dodge::GetSingleton();
 	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
@@ -1665,7 +1668,7 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance * attack_speed));
-					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
 			}else{
@@ -1674,7 +1677,7 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance * attack_speed));
-						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
 				}
@@ -1708,7 +1711,7 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
 			}else{
@@ -1717,7 +1720,7 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance));
-						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
 				}
@@ -1729,8 +1732,9 @@ void dodge::Bash_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_direct
 
 void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float mov_speed, bool a_forceDodge)
 {
+	a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
 
-    auto DS = dodge::GetSingleton();
+	auto DS = dodge::GetSingleton();
 	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 
 	
@@ -1758,7 +1762,7 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 				do_dodge_VLSerana(a_actor, direction);
 				if (settings::bCombatlogging_enable) {
 					logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0f)));
-					logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+					// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 					
 				}
 			}else{
@@ -1767,7 +1771,7 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 					do_dodge(a_actor, direction);
 					if (settings::bCombatlogging_enable) {
 						logger::info("Name {} ajusted_reflexScore {}"sv, a_actor->GetName(), (dodge_chance/(mov_speed * 2.0f)));
-						logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
+						// logger::info("Name {} Reach {}"sv, a_actor->GetName(), Actor_GetReach(a_actor));
 						
 					}
 				}
