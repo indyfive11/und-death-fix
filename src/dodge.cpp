@@ -1438,9 +1438,6 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 				default:
 					break;
 				}
-
-
-				
 			}
 		}
 	}
