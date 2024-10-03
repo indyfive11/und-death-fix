@@ -1100,7 +1100,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 		for (auto it = combatGroup->targets.begin(); it != combatGroup->targets.end(); ++it) {
 			if (it->targetHandle && it->targetHandle.get().get()) {
 				RE::Actor* refr = it->targetHandle.get().get();
-				if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) <= attack_range) {
+				if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) <= attack_range + 500.0f) {
 					
 					if (refr->IsPlayerRef() || refr->IsDead() || !refr->IsInCombat()) {
 						continue;
@@ -1135,14 +1135,20 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						continue;
 					}
 
-					switch (settings::iDodgeAI_Framework) {
-					case 0:
-						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_reactive, mov_speed);
-						break;
-					case 1:
-						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
-						break;
-					}
+					refr->SetGraphVariableFloat("fUND_Update_time_required", mov_speed * 0.75f);
+					refr->SetGraphVariableFloat("fUND_Update_time_counter", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_attackSpeed", mov_speed);
+					refr->SetGraphVariableInt("iUND_dodge_type", 2);
+					refr->SetGraphVariableBool("bUND_Update", true);
+
+					// switch (settings::iDodgeAI_Framework) {
+					// case 0:
+					// 	dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_reactive, mov_speed);
+					// 	break;
+					// case 1:
+					// 	// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
+					// 	break;
+					// }
 				}
 				continue;
 			}
@@ -1275,37 +1281,19 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 
-					switch (settings::iDodgeAI_Framework) {
-					case 0:
-						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
-						break;
-					case 1:
-						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-						break;
-					}
+					refr->SetGraphVariableFloat("fUND_Update_time_required", attack_speed * 1.5f);
+					refr->SetGraphVariableFloat("fUND_Update_time_counter", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_attackSpeed", attack_speed);
+					refr->SetGraphVariableInt("iUND_dodge_type", 1);
+					refr->SetGraphVariableBool("bUND_Update", true);
 
-					// float check = dodge::GetSingleton()->GetShoutRange_Reaction(refr, refr->GetPosition().GetDistance(a_attacker->GetPosition()));
-					// if (check > 0.5f) {
-					// 	auto check_int = static_cast<int>(check * 1000.0f);
-					// 	for (start = Clock::now(), now = start; now < start + std::chrono::milliseconds{ check_int }; now = Clock::now()) {
-					// 	}
-					// 	switch (settings::iDodgeAI_Framework) {
-					// 	case 0:
-					// 		dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive);
-					// 		break;
-					// 	case 1:
-					// // 		dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-					// 		break;
-					// 	}
-					// } else {
-					// 	switch (settings::iDodgeAI_Framework) {
-					// 	case 0:
-					// 		dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive);
-					// 		break;
-					// 	case 1:
-					// // 		dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-					// 		break;
-					// 	}
+					// switch (settings::iDodgeAI_Framework) {
+					// case 0:
+					// 	dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
+					// 	break;
+					// case 1:
+					// 	// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
+					// 	break;
 					// }
 				}
 				continue;
@@ -1372,56 +1360,6 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 						// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
 						break;
 					}
-
-					// if (lefthand){
-					// 	float check = dodge::GetSingleton()->GetSpellRange_Reaction(refr, refr->GetPosition().GetDistance(a_attacker->GetPosition()), true);
-					// 	if (check > 0.5f){
-					// 		auto check_int = static_cast<int>(check * 1000.0f);
-					// 		for (start = Clock::now(), now = start; now < start + std::chrono::milliseconds{ check_int }; now = Clock::now()) {
-					// 		}
-					// 		switch (settings::iDodgeAI_Framework) {
-					// 		case 0:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
-					// 			break;
-					// 		case 1:
-					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-					// 			break;
-					// 		}
-					// 	} else {
-					// 		switch (settings::iDodgeAI_Framework) {
-					// 		case 0:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
-					// 			break;
-					// 		case 1:
-					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-					// 			break;
-					// 		}
-					// 	}
-					// }else {
-					// 	float check = dodge::GetSingleton()->GetSpellRange_Reaction(refr, refr->GetPosition().GetDistance(a_attacker->GetPosition()));
-					// 	if (check > 0.5f) {
-					// 		auto check_int = static_cast<int>(check * 1000.0f);
-					// 		for (start = Clock::now(), now = start; now < start + std::chrono::milliseconds{ check_int }; now = Clock::now()) {
-					// 		}
-					// 		switch (settings::iDodgeAI_Framework) {
-					// 		case 0:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
-					// 			break;
-					// 		case 1:
-					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-					// 			break;
-					// 		}
-					// 	}else{
-					// 		switch (settings::iDodgeAI_Framework) {
-					// 		case 0:
-					// 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_tk_horizontal);
-					// 			break;
-					// 		case 1:
-					// // 			dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-					// 			break;
-					// 		}
-					// 	}
-					// }
 				}
 				continue;
 			}
@@ -1458,10 +1396,53 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 {
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
-		auto bPGC_IsInCombat = false;
-		if (a_actor->GetGraphVariableBool("bPGC_IsInCombat", bPGC_IsInCombat) && bPGC_IsInCombat) {
-			
-		} 
+		auto bUND_Update = false;
+		if (a_actor->GetGraphVariableBool("bUND_Update", bUND_Update) && bUND_Update) {
+			bool bIsDodging = false;
+			if (a_actor->GetGraphVariableBool("bIsDodging", bIsDodging) && !bIsDodging) {
+				a_actor->SetGraphVariableBool("bIsDodging", true);
+			}
+			float fUND_Update_time_required = 0.0f;
+			float fUND_Update_time_counter = 0.0f;
+			float fUND_Update_attackSpeed = 0.0f;
+			a_actor->GetGraphVariableFloat("fUND_Update_time_required", fUND_Update_time_required);
+			a_actor->GetGraphVariableFloat("fUND_Update_time_counter", fUND_Update_time_counter);
+			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed", fUND_Update_attackSpeed);
+
+			fUND_Update_time_counter += g_deltaTime;
+
+			if (fUND_Update_time_counter >= fUND_Update_time_required){
+				int iUND_dodge_type = 0;
+				a_actor->GetGraphVariableInt("iUND_dodge_type", iUND_dodge_type);
+				a_actor->SetGraphVariableBool("bUND_Update", false);
+				a_actor->SetGraphVariableBool("bIsDodging", false);
+
+				switch (iUND_dodge_type)
+				{
+				case 1:
+					/* spells */
+					if (fUND_Update_attackSpeed == 0.0f) {
+						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_reactive, fUND_Update_attackSpeed);
+					} else {
+						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed);
+					}
+					a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
+					break;
+
+				case 2:
+					/* bash sprint */
+					dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed);
+					a_actor->SetGraphVariableInt("iUND_dodge_type", 0);
+					break;
+
+				default:
+					break;
+				}
+
+
+				
+			}
+		}
 	}
 }
 
