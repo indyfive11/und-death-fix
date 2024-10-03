@@ -1135,9 +1135,9 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						continue;
 					}
 
-					auto bUND_Update = false;
+					auto bUND_Update_bashsprint = false;
 
-					if (refr->GetGraphVariableBool("bUND_Update", bUND_Update) && bUND_Update) {
+					if (refr->GetGraphVariableBool("bUND_Update_bashsprint", bUND_Update_bashsprint) && bUND_Update_bashsprint) {
 						continue;
 					}
 
@@ -1145,11 +1145,10 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 
 					auto time = (distance/(mov_speed * 2.0f)) * 1.5f;
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required", time);
-					refr->SetGraphVariableFloat("fUND_Update_time_counter", 0.0f);
-					refr->SetGraphVariableFloat("fUND_Update_attackSpeed", mov_speed);
-					refr->SetGraphVariableInt("iUND_dodge_type", 2);
-					refr->SetGraphVariableBool("bUND_Update", true);
+					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time);
+					refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
+					refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
 
 					// switch (settings::iDodgeAI_Framework) {
 					// case 0:
@@ -1291,17 +1290,16 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 
-					auto bUND_Update = false;
+					auto bUND_Update_spell = false;
 
-					if (refr->GetGraphVariableBool("bUND_Update", bUND_Update) && bUND_Update){
+					if (refr->GetGraphVariableBool("bUND_Update_spell", bUND_Update_spell) && bUND_Update_spell) {
 						continue;
 					}
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required", attack_speed * 1.5f);
-					refr->SetGraphVariableFloat("fUND_Update_time_counter", 0.0f);
-					refr->SetGraphVariableFloat("fUND_Update_attackSpeed", attack_speed);
-					refr->SetGraphVariableInt("iUND_dodge_type", 1);
-					refr->SetGraphVariableBool("bUND_Update", true);
+					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", attack_speed * 1.5f);
+					refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
+					refr->SetGraphVariableBool("bUND_Update_spell", true);
 
 					// switch (settings::iDodgeAI_Framework) {
 					// case 0:
@@ -1413,7 +1411,7 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 {
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
 		auto bUND_Update_spell = false;
-		auto bUND_Update_bashsprint = false;
+
 		if (a_actor->GetGraphVariableBool("bUND_Update_spell", bUND_Update_spell) && bUND_Update_spell) {
 			float fUND_Update_time_required_spell = 0.0f;
 			float fUND_Update_time_counter_spell = 0.0f;
@@ -1438,6 +1436,8 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 				}
 			}
 		}
+
+		auto bUND_Update_bashsprint = false;
 
 		if (a_actor->GetGraphVariableBool("bUND_Update_bashsprint", bUND_Update_bashsprint) && bUND_Update_bashsprint) {
 			float fUND_Update_time_required_bashsprint = 0.0f;
