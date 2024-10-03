@@ -642,6 +642,7 @@ std::pair<bool, float> dodge::GetAttackSpell_Alt(RE::SpellItem* a_spell)
 					float speed = Effect->baseEffect->data.projectileBase->data.speed;
 					if (speed && speed != 0.0f) {
 						time = 3000.0f / (speed * 2.0f);
+						logger::info("Name {} projectilespeed{}"sv, "Actor", speed);
 						break;
 					}
 				}
