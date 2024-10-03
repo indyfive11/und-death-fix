@@ -642,7 +642,7 @@ std::pair<bool, float> dodge::GetAttackSpell_Alt(RE::SpellItem* a_spell)
 					float speed = Effect->baseEffect->data.projectileBase->data.speed;
 					if (speed && speed != 0.0f) {
 						time = 3000.0f / (speed * 2.0f);
-						logger::info("Name {} projectilespeed{}"sv, "Actor", speed);
+						//logger::info("Name {} projectilespeed{}"sv, "Actor", speed);
 						break;
 					}
 				}
@@ -1143,22 +1143,15 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					}
 
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
-
-					auto time = (distance/(mov_speed * 2.0f)) * 1.5f;
-
-					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time);
-					refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
-					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
-					refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
-
-					// switch (settings::iDodgeAI_Framework) {
-					// case 0:
-					// 	dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_reactive, mov_speed);
-					// 	break;
-					// case 1:
-					// 	// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_all);
-					// 	break;
-					// }
+					auto time = (distance/(mov_speed * 2.0f));
+					if (time > 0.5f) {
+						refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time - 0.5f);
+						refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
+						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
+						refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
+					}else{
+						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_horizontal, mov_speed);
+					}
 				}
 				continue;
 			}
@@ -1297,19 +1290,17 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", attack_speed * 1.5f);
-					refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
-					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
-					refr->SetGraphVariableBool("bUND_Update_spell", true);
+					if (attack_speed > 0.5f){
+						refr->SetGraphVariableFloat("fUND_Update_time_required_spell", attack_speed - 0.5f);
+						refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
+						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
+						refr->SetGraphVariableBool("bUND_Update_spell", true);
+					}else if(attack_speed == 0.0f){
+						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
 
-					// switch (settings::iDodgeAI_Framework) {
-					// case 0:
-					// 	dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
-					// 	break;
-					// case 1:
-					// 	// dodge::GetSingleton()->attempt_dodge(refr, &dodge_directions_dmco_reactive);
-					// 	break;
-					// }
+					}else{
+						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
+					}
 				}
 				continue;
 			}
