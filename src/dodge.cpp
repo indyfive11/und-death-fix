@@ -1143,15 +1143,11 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					}
 
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
-					auto time = (distance/(mov_speed * 2.0f));
-					if (time > 0.5f) {
-						refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time - 0.5f);
-						refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
-						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
-						refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
-					}else{
-						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_horizontal, mov_speed);
-					}
+					auto time = distance/mov_speed;
+					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time / 10.0f);
+					refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
+					refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
 				}
 				continue;
 			}
@@ -1289,18 +1285,10 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					if (refr->GetGraphVariableBool("bUND_Update_spell", bUND_Update_spell) && bUND_Update_spell) {
 						continue;
 					}
-
-					if (attack_speed > 0.5f){
-						refr->SetGraphVariableFloat("fUND_Update_time_required_spell", attack_speed - 0.5f);
-						refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
-						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
-						refr->SetGraphVariableBool("bUND_Update_spell", true);
-					}else if(attack_speed == 0.0f){
-						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed);
-
-					}else{
-						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
-					}
+					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", (attack_speed * 2.0f)/10.0f);
+					refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
+					refr->SetGraphVariableBool("bUND_Update_spell", true);
 				}
 				continue;
 			}
