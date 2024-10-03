@@ -1370,7 +1370,7 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 float dodge::round_to(double value, double value2, double divding_num, double precision)
 {
 	double result = value / (value2 * divding_num);
-	return static_cast<float>(std::round(value / precision) * precision);
+	return static_cast<float>(std::round(result / precision) * precision);
 }
 
 //void dodge::set_dodge_phase(RE::Actor* a_dodger, bool a_isDodging)
