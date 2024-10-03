@@ -1143,11 +1143,11 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, doub
 						continue;
 					}
 
-					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
-					auto time = distance/mov_speed;
+					double distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
+					double time = distance/mov_speed;
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", dodge::GetSingleton()->GenerateRandomFloat(0.0, time / 100.0));
-					refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", dodge::GetSingleton()->GenerateRandomFloat(0.0, time / 10.0));
+					refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
 					refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
 				}
@@ -1291,8 +1291,8 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, do
 					double distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 					double time = distance/attack_speed;
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", dodge::GetSingleton()->GenerateRandomFloat(0.0, time / 100.0));
-					refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
+					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", dodge::GetSingleton()->GenerateRandomFloat(0.0, time / 10.0));
+					refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
 					refr->SetGraphVariableBool("bUND_Update_spell", true);
 				}
