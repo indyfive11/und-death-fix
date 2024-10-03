@@ -1135,6 +1135,12 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						continue;
 					}
 
+					auto bUND_Update = false;
+
+					if (refr->GetGraphVariableBool("bUND_Update", bUND_Update) && bUND_Update) {
+						continue;
+					}
+
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 
 					auto time = (distance/(mov_speed * 2.0f)) * 1.5f;
@@ -1285,6 +1291,12 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 
+					auto bUND_Update = false;
+
+					if (refr->GetGraphVariableBool("bUND_Update", bUND_Update) && bUND_Update){
+						continue;
+					}
+
 					refr->SetGraphVariableFloat("fUND_Update_time_required", attack_speed * 1.5f);
 					refr->SetGraphVariableFloat("fUND_Update_time_counter", 0.0f);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed", attack_speed);
@@ -1400,46 +1412,50 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 {
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
-		auto bUND_Update = false;
-		if (a_actor->GetGraphVariableBool("bUND_Update", bUND_Update) && bUND_Update) {
-			float fUND_Update_time_required = 0.0f;
-			float fUND_Update_time_counter = 0.0f;
-			float fUND_Update_attackSpeed = 0.0f;
-			a_actor->GetGraphVariableFloat("fUND_Update_time_required", fUND_Update_time_required);
-			a_actor->GetGraphVariableFloat("fUND_Update_time_counter", fUND_Update_time_counter);
-			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed", fUND_Update_attackSpeed);
+		auto bUND_Update_spell = false;
+		auto bUND_Update_bashsprint = false;
+		if (a_actor->GetGraphVariableBool("bUND_Update_spell", bUND_Update_spell) && bUND_Update_spell) {
+			float fUND_Update_time_required_spell = 0.0f;
+			float fUND_Update_time_counter_spell = 0.0f;
+			float fUND_Update_attackSpeed_spell = 0.0f;
+			a_actor->GetGraphVariableFloat("fUND_Update_time_required_spell", fUND_Update_time_required_spell);
+			a_actor->GetGraphVariableFloat("fUND_Update_time_counter_spell", fUND_Update_time_counter_spell);
+			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed_spell", fUND_Update_attackSpeed_spell);
 
-			logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required);
-			auto counter = fUND_Update_time_counter += g_deltaTime;
-			a_actor->SetGraphVariableFloat("fUND_Update_time_counter", counter);
-			logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter);
+			logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required_spell);
+			auto counter = fUND_Update_time_counter_spell += g_deltaTime;
+			a_actor->SetGraphVariableFloat("fUND_Update_time_counter_spell", counter);
+			logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_spell);
 
-			if (counter >= fUND_Update_time_required){
-				int iUND_dodge_type = 0;
-				a_actor->GetGraphVariableInt("iUND_dodge_type", iUND_dodge_type);
-				a_actor->SetGraphVariableBool("bUND_Update", false);
-				logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed);
-				logger::info("Name {} dodgetype {}"sv, a_actor->GetName(), iUND_dodge_type);
+			if (counter >= fUND_Update_time_required_spell) {
+				a_actor->SetGraphVariableBool("bUND_Update_spell", false);
+				logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_spell);
 
-				switch (iUND_dodge_type)
-				{
-				case 1:
-					/* spells */
-					if (fUND_Update_attackSpeed == 0.0f) {
-						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_reactive, fUND_Update_attackSpeed);
-					} else {
-						dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed);
-					}
-					break;
-
-				case 2:
-					/* bash sprint */
-					dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed);
-					break;
-
-				default:
-					break;
+				if (fUND_Update_attackSpeed_spell == 0.0f) {
+					dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_reactive, fUND_Update_attackSpeed_spell);
+				} else {
+					dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed_spell);
 				}
+			}
+		}
+
+		if (a_actor->GetGraphVariableBool("bUND_Update_bashsprint", bUND_Update_bashsprint) && bUND_Update_bashsprint) {
+			float fUND_Update_time_required_bashsprint = 0.0f;
+			float fUND_Update_time_counter_bashsprint = 0.0f;
+			float fUND_Update_attackSpeed_bashsprint = 0.0f;
+			a_actor->GetGraphVariableFloat("fUND_Update_time_required_bashsprint", fUND_Update_time_required_bashsprint);
+			a_actor->GetGraphVariableFloat("fUND_Update_time_counter_bashsprint", fUND_Update_time_counter_bashsprint);
+			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", fUND_Update_attackSpeed_bashsprint);
+
+			logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required_bashsprint);
+			auto counter = fUND_Update_time_counter_bashsprint += g_deltaTime;
+			a_actor->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", counter);
+			logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_bashsprint);
+
+			if (counter >= fUND_Update_time_required_bashsprint) {
+				a_actor->SetGraphVariableBool("bUND_Update_bashsprint", false);
+				logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_bashsprint);
+				dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed_bashsprint);
 			}
 		}
 	}
