@@ -1147,11 +1147,11 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					auto time = distance/mov_speed;
 					auto time_needed = dodge::GetSingleton()->GenerateRandomFloat(0.0f, dodge::round_to(time, 10.0, 1.0));
 
-					if (time_needed <= 0.015f){
+					if (time_needed <= 0.075f) {
 						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_horizontal, mov_speed);
 
-					}else{
-						refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time_needed - 0.1f);
+					} else {
+						refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time_needed - 0.075f);
 						refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
 						refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
@@ -1297,12 +1297,12 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					auto time = distance/attack_speed;
 					auto time_needed = dodge::GetSingleton()->GenerateRandomFloat(0.0f, dodge::round_to(time, 10.0, 1.0));
 
-					if (time_needed <= 0.1f){
+					if (time_needed <= 0.075f) {
 						time_needed <= 0.0f ? dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed) 
 						: dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
 
-					}else{
-						refr->SetGraphVariableFloat("fUND_Update_time_required_spell", time_needed - 0.1f);
+					} else {
+						refr->SetGraphVariableFloat("fUND_Update_time_required_spell", time_needed - 0.075f);
 						refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
 						refr->SetGraphVariableBool("bUND_Update_spell", true);
