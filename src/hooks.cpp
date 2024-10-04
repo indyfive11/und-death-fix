@@ -148,7 +148,7 @@ namespace hooks
 		auto it = dodge::GetSingleton()->GetAttackSpell_Alt(a_spell);
 
 		if (it.first){
-			dodge::GetSingleton()->react_to_shouts_spells(a_actor, 3000.0f, it.second);
+			dodge::GetSingleton()->react_to_shouts_spells(a_actor, 6000.0f, it.second);
 		}
 		
 	}

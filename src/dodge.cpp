@@ -456,7 +456,7 @@ std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
 					distance = 350.0f;
 					break;
 				case RE::WEAPON_TYPE::kTwoHandSword:
-					distance = 370.0;
+					distance = 370.0f;
 					break;
 				case RE::WEAPON_TYPE::kHandToHandMelee:
 					if (!Utils::Actor::isHumanoid(actor)) {
@@ -466,13 +466,13 @@ std::pair<float, float> dodge::Get_ReactiveDodge_Distance(RE::Actor* actor)
 					}
 					break;
 				case RE::WEAPON_TYPE::kBow:
-					distance = 1500.0;
+					distance = 3000.0f;
 					break;
 				case RE::WEAPON_TYPE::kCrossbow:
-					distance = 2100.0;
+					distance = 3000.0f;
 					break;
 				case RE::WEAPON_TYPE::kStaff:
-					distance = 320.0;
+					distance = 320.0f;
 					break;
 				default:
 					distance = 150.0f;
@@ -1426,14 +1426,19 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 			a_actor->GetGraphVariableFloat("fUND_Update_time_counter_spell", fUND_Update_time_counter_spell);
 			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed_spell", fUND_Update_attackSpeed_spell);
 
-			logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required_spell);
+			if (settings::bCombatlogging_enable){
+				logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required_spell);
+			}
 			auto counter = fUND_Update_time_counter_spell += g_deltaTime;
 			a_actor->SetGraphVariableFloat("fUND_Update_time_counter_spell", counter);
-			logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_spell);
-
+			if (settings::bCombatlogging_enable) {
+				logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_spell);
+			}
 			if (counter >= fUND_Update_time_required_spell) {
 				a_actor->SetGraphVariableBool("bUND_Update_spell", false);
-				logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_spell);
+				if (settings::bCombatlogging_enable) {
+					logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_spell);
+				}
 				dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed_spell);
 			}
 		}
@@ -1448,14 +1453,19 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 			a_actor->GetGraphVariableFloat("fUND_Update_time_counter_bashsprint", fUND_Update_time_counter_bashsprint);
 			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", fUND_Update_attackSpeed_bashsprint);
 
-			logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required_bashsprint);
+			if (settings::bCombatlogging_enable) {
+				logger::info("Name {} timerequired {}"sv, a_actor->GetName(), fUND_Update_time_required_bashsprint);
+			}
 			auto counter = fUND_Update_time_counter_bashsprint += g_deltaTime;
 			a_actor->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", counter);
-			logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_bashsprint);
-
+			if (settings::bCombatlogging_enable) {
+				logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_bashsprint);
+			}
 			if (counter >= fUND_Update_time_required_bashsprint) {
 				a_actor->SetGraphVariableBool("bUND_Update_bashsprint", false);
-				logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_bashsprint);
+				if (settings::bCombatlogging_enable) {
+					logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_bashsprint);
+				}
 				dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed_bashsprint);
 			}
 		}
