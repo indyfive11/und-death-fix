@@ -1146,7 +1146,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 					auto time = distance/mov_speed;
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", dodge::GetSingleton()->GenerateRandomFloat(0.0f, dodge::round_to(time, 10.0, 1.0)));
+					refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", dodge::GetSingleton()->GenerateRandomFloat(0.0f, dodge::round_to(time, 1.0, 1.0)));
 					refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
 					refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
@@ -1291,7 +1291,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 					auto time = distance/attack_speed;
 
-					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", dodge::GetSingleton()->GenerateRandomFloat(0.0f, dodge::round_to(time, 10.0, 1.0)));
+					refr->SetGraphVariableFloat("fUND_Update_time_required_spell", dodge::GetSingleton()->GenerateRandomFloat(0.0f, dodge::round_to(time, 1.0, 1.0)));
 					refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
 					refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
 					refr->SetGraphVariableBool("bUND_Update_spell", true);
@@ -1370,7 +1370,12 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 float dodge::round_to(double value, double value2, double divding_num, double precision)
 {
 	double result = value / (value2 * divding_num);
-	return static_cast<float>(std::round(result / precision) * precision);
+	auto answer =  static_cast<float>(std::round(result / precision) * precision);
+	if (isinf(answer)) {
+		return 0.0f;
+	}else{
+		return answer;
+	}
 }
 
 //void dodge::set_dodge_phase(RE::Actor* a_dodger, bool a_isDodging)
