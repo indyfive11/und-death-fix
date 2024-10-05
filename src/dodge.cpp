@@ -391,7 +391,7 @@ bool dodge::IsMeleeOnly(RE::Actor* a_actor)
 {
 	using TYPE = RE::CombatInventoryItem::TYPE;
 
-	auto result = true;
+	auto result = false;
 		
 	auto combatCtrl = a_actor->GetActorRuntimeData().combatController;
 	auto CombatInv = combatCtrl ? combatCtrl->inventory : nullptr;
@@ -399,14 +399,9 @@ bool dodge::IsMeleeOnly(RE::Actor* a_actor)
 		for (const auto item : CombatInv->equippedItems) {
 			if (item.item) {
 				switch (item.item->GetType()) {
-				case TYPE::kMagic:
-				case TYPE::kRanged:
-				case TYPE::kScroll:
-				case TYPE::kStaff:
-
-					result = false;
+				case TYPE::kMelee:
+					result = true;
 					break;
-
 				default:
 					break;
 				}
