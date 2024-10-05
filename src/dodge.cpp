@@ -403,7 +403,7 @@ bool dodge::IsMeleeOnly(RE::Actor* a_actor)
 				case TYPE::kRanged:
 				case TYPE::kScroll:
 				case TYPE::kStaff:
-				
+
 					result = false;
 					break;
 
@@ -1244,7 +1244,7 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float att
 					}
 
 					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 512.0f 
-					&& dodge::is_melee(refr) && refr->AsActorState()->IsSprinting() && refr->AsActorState()->actorState1.movingForward 
+					&& IsMeleeOnly(refr) && refr->AsActorState()->IsSprinting() && refr->AsActorState()->actorState1.movingForward 
 					&& !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
@@ -1316,7 +1316,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					}
 
 					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 512.0f 
-					&& dodge::is_melee(refr) && refr->AsActorState()->IsSprinting() && refr->AsActorState()->actorState1.movingForward 
+					&& IsMeleeOnly(refr) && refr->AsActorState()->IsSprinting() && refr->AsActorState()->actorState1.movingForward 
 					&& !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
