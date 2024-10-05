@@ -387,6 +387,36 @@ bool dodge::is_melee(RE::Actor* actor){
 	return GetEquippedType_IsMelee(actor);
 }
 
+bool dodge::IsMeleeOnly(RE::Actor* a_actor)
+{
+	using TYPE = RE::CombatInventoryItem::TYPE;
+
+	auto result = true;
+		
+	auto combatCtrl = a_actor->GetActorRuntimeData().combatController;
+	auto CombatInv = combatCtrl ? combatCtrl->inventory : nullptr;
+	if (CombatInv) {
+		for (const auto item : CombatInv->equippedItems) {
+			if (item.item) {
+				switch (item.item->GetType()) {
+				case TYPE::kMagic:
+				case TYPE::kRanged:
+				case TYPE::kScroll:
+				case TYPE::kStaff:
+				
+					result = false;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
 float dodge::confidence_threshold(RE::Actor* a_actor)
 {
 	float result = 0.0f;
