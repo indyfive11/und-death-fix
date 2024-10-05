@@ -406,6 +406,9 @@ bool dodge::IsMeleeOnly(RE::Actor* a_actor)
 					break;
 				}
 			}
+			if (result) {
+				break;
+			}
 		}
 	}
 
