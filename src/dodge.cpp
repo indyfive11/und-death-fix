@@ -1214,9 +1214,11 @@ void dodge::react_to_ranged(RE::Actor* a_attacker, float attack_range, float att
 					}
 
 					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 512.0f 
-					&& dodge::is_melee(refr) && !is_adequate_threat(refr, a_attacker)){
+					&& dodge::is_melee(refr) && refr->AsActorState()->IsSprinting() && refr->AsActorState()->actorState1.movingForward 
+					&& !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
+					
 
 					switch (settings::iDodgeAI_Framework) {
 					case 0:
@@ -1284,7 +1286,8 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					}
 
 					if (refr->GetPosition().GetDistance(a_attacker->GetPosition()) > 512.0f 
-					&& dodge::is_melee(refr) && !is_adequate_threat(refr, a_attacker)){
+					&& dodge::is_melee(refr) && refr->AsActorState()->IsSprinting() && refr->AsActorState()->actorState1.movingForward 
+					&& !is_adequate_threat(refr, a_attacker)){
 						continue;
 					}
 
