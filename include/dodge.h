@@ -170,9 +170,6 @@ public:
 	float confidence_threshold(RE::Actor *a_actor);
 	void Update(RE::Actor* a_actor, float a_delta);
 	float round_to(double value, double value2, double divding_num, double precision = 0.001);
-	int divide(int nu, int de);
-	float divideIntegers(float num, float den);
-	float div(float a, float b);
 
 	static void install_protected()
 	{

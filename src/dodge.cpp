@@ -416,56 +416,6 @@ bool dodge::IsMeleeOnly(RE::Actor* a_actor)
 }
 
 
-int dodge::divide(int nu, int de)
-{
-	int temp = 1;
-	int quotient = 0;
-
-	while (de <= nu) {
-		de <<= 1;
-		temp <<= 1;
-	}
-
-	//printf("%d %d\n",de,temp,nu);
-	while (temp > 1) {
-		de >>= 1;
-		temp >>= 1;
-
-		if (nu >= de) {
-			nu -= de;
-			//printf("%d %d\n",quotient,temp);
-			quotient += temp;
-		}
-	}
-
-	return quotient;
-}
-
-float dodge::divideIntegers(float num, float den)
-{
-	float sign = (num * den < 0) ? -1 : 1;
-	num = abs(num);
-	den = abs(den);
-	float quo = 0;
-	while ((num -= den) >= 0)
-		quo++;
-	return sign * quo;
-}
-
-float dodge::div(float a, float b)
-{
-	float count = 0;
-	if (b == 0)
-		return -1;  //undefined
-	else if (b == 1)
-		return a;
-	else if (b > 1) {
-		for (float i = b; i <= a; i += b) {
-			count++;
-		}
-	}
-	return count;
-}
 
 float dodge::confidence_threshold(RE::Actor* a_actor)
 {
