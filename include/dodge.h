@@ -169,7 +169,7 @@ public:
 	static bool GetEquippedType_IsMelee(RE::Actor *actor);
 	float confidence_threshold(RE::Actor *a_actor);
 	void Update(RE::Actor* a_actor, float a_delta);
-	double round_to(double value, double precision = 0.0001);
+	long double round_to(long double value, long double precision = 0.001);
 
 	static void install_protected()
 	{

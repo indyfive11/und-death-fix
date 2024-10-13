@@ -1190,7 +1190,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					}
 
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition()); ;
-					auto time = static_cast<double>(distance) / static_cast<double>(mov_speed);
+					auto time = static_cast<long double>(distance) / static_cast<long double>(mov_speed);
 					auto time_needed = time / 10.0;
 					// std::setprecision();
 					//long double
@@ -1199,7 +1199,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_horizontal, mov_speed);
 
 					} else {
-						auto time_wanted = static_cast<int>(dodge::round_to((time_needed - 0.1) * 10000.0));
+						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.1) * 10000.0));
 						//refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time_needed - 0.1f);
 						refr->SetGraphVariableInt("iUND_Update_time_required_bashsprint", time_wanted);
 						refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
@@ -1349,7 +1349,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 					// auto time = divide(static_cast<int>(distance), static_cast<int>(attack_speed));
 					// auto time_needed = divide(time, 10);
-					auto time = static_cast<double>(distance)/static_cast<double>(attack_speed);
+					auto time = static_cast<long double>(distance)/static_cast<long double>(attack_speed);
 					auto time_needed = time/10.0;
 
 					if (time_needed <= 0.1f) {
@@ -1358,7 +1358,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 
 					} else {
 
-						auto time_wanted = static_cast<int>(dodge::round_to((time_needed - 0.1) * 10000.0));
+						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.1) * 10000.0));
 						//refr->SetGraphVariableFloat("fUND_Update_time_required_spell", time_needed - 0.1);
 						refr->SetGraphVariableInt("iUND_Update_time_required_spell", time_wanted);
 						refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
@@ -1437,7 +1437,7 @@ void dodge::react_to_shouts_spells_fast(RE::Actor* a_attacker, float attack_rang
 	}
 }
 
-double dodge::round_to(double value, double precision)
+long double dodge::round_to(long double value, long double precision)
 {
 	return (std::round(value / precision) * precision);
 }
