@@ -1195,11 +1195,11 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					// std::setprecision();
 					//long double
 
-					if (time_needed <= 0.1f) {
+					if (time_needed <= 0.5f || mov_speed == 0.0) {
 						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_horizontal, mov_speed);
 
 					} else {
-						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.1) * 10000.0));
+						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.5) * 10000.0));
 						//refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time_needed - 0.1f);
 						refr->SetGraphVariableInt("iUND_Update_time_required_bashsprint", time_wanted);
 						refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
@@ -1352,13 +1352,12 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					auto time = static_cast<long double>(distance)/static_cast<long double>(attack_speed);
 					auto time_needed = time/10.0;
 
-					if (time_needed <= 0.1f) {
-						time_needed <= 0.0f ? dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed) 
+					if (time_needed <= 0.5f || attack_speed == 0.0) {
+						time_needed <= 0.0f || attack_speed == 0.0 ? dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed) 
 						: dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
 
 					} else {
-
-						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.1) * 10000.0));
+						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.5) * 10000.0));
 						//refr->SetGraphVariableFloat("fUND_Update_time_required_spell", time_needed - 0.1);
 						refr->SetGraphVariableInt("iUND_Update_time_required_spell", time_wanted);
 						refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
