@@ -809,40 +809,31 @@ bool dodge::is_adequate_threat(RE::Actor* protagonist, RE::Actor* attacker)
 	float protagonist_threat = 0.0f;
 	float attacker_threat = 0.0f;
 
-	auto combatGroup = protagonist->GetCombatGroup();
-	if (combatGroup) {
-		try
-		{
-			for (auto it = combatGroup->members.begin(); it != combatGroup->members.end(); ++it) {
-				if (it->memberHandle && it->memberHandle.get().get() && it->memberHandle.get().get() == protagonist) {
-					protagonist_threat += it->threatValue;
-					break;
+	if (const auto combatGroup = protagonist->GetCombatGroup()) {
+		for (auto& memberData : combatGroup->members) {
+			if (auto ally = memberData.memberHandle.get(); ally) {
+				if (ally.get() == protagonist) {
+					if (auto value = memberData.threatValue; value) {
+						protagonist_threat += value;
+						break;
+					}
 				}
-				continue;
 			}
+			continue;
 		}
-		catch(...)
-		{
-			return adequate_threat;
-		}
-		
-		
 	}
-	auto EnemyGroup = attacker->GetCombatGroup();
-	if (EnemyGroup) {
-		try
-		{
-			for (auto it = EnemyGroup->members.begin(); it != EnemyGroup->members.end(); ++it) {
-				if (it->memberHandle && it->memberHandle.get().get() && it->memberHandle.get().get() == attacker) {
-					attacker_threat += it->threatValue;
-					break;
+
+	if (const auto combatGroup = attacker->GetCombatGroup()) {
+		for (auto& memberData : combatGroup->members) {
+			if (auto ally = memberData.memberHandle.get(); ally) {
+				if (ally.get() == attacker) {
+					if (auto value = memberData.threatValue; value) {
+						attacker_threat += value;
+						break;
+					}
 				}
-				continue;
 			}
-		}
-		catch(...)
-		{
-			return adequate_threat;
+			continue;
 		}
 	}
 
