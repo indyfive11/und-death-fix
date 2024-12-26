@@ -39,7 +39,7 @@ float dodge::GetProtaganist_ReflexScore(RE::Actor* a_actor){
 
 bool dodge::BindPapyrusFunctions(RE::BSScript::IVirtualMachine* vm)
 {
-	vm->RegisterFunction("GetProtaganist_ReflexScore", "_SM_UND_NativeFunctions", GetProtaganist_ReflexScore);
+	//vm->RegisterFunction("GetProtaganist_ReflexScore", "_SM_UND_NativeFunctions", GetProtaganist_ReflexScore);
 	// vm->RegisterFunction("Protagnist_can_dodge", "_SM_UND_NativeFunctions", Protagnist_can_dodge);
 	return true;
 }
