@@ -1,11 +1,20 @@
 #pragma once
 //#include <unordered_set>
-#include <algorithm>
 #include "RE/M/Misc.h"
 #include "lib/PrecisionAPI.h"
-#include <iomanip>
+#include <algorithm>
 #include <chrono>
-
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <mutex>
+#include <shared_mutex>
+#include <sstream>
+#include <string>
+#include <tuple>
+#include <unordered_set>
+#include <vector>
+#include <windows.h>
 
 using PRECISION_API::PreHitCallback;
 using std::string;

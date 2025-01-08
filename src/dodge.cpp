@@ -1,7 +1,6 @@
 #include "settings.h"
 #pragma warning(disable: 4100)
-#include <iostream>
-#include <windows.h>
+
 
 // using Clock = std::chrono::steady_clock;
 // std::chrono::time_point<std::chrono::steady_clock> start, now;
