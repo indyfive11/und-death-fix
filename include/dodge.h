@@ -1,11 +1,11 @@
 #pragma once
 //#include <unordered_set>
-#include <algorithm>
 #include "RE/M/Misc.h"
 #include "lib/PrecisionAPI.h"
-#include <iomanip>
+#include <algorithm>
 #include <chrono>
-
+#include <iomanip>
+#include <string>
 
 using PRECISION_API::PreHitCallback;
 using std::string;
