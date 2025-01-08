@@ -1192,11 +1192,11 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
 						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>((time - 0.5) * 1000.0));
 						if (settings::bCombatlogging_enable) {
-							logger::info("Name {} timerequired {}"sv, refr->GetName(), required);
+							// logger::info("Name {} timerequired {}"sv, refr->GetName(), required);
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
 						}
 						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
-						set_tupledata(data, true, std::chrono::steady_clock::now(), 100ms, "BashSprintWait_Update");
+						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "BashSprintWait_Update");
 						GetSingleton()->RegisterforUpdate(refr, data);
 						
 					}
@@ -1354,11 +1354,11 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
 						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>((time - 0.5) * 1000.0));
 						if (settings::bCombatlogging_enable) {
-							logger::info("Name {} timerequired {}"sv, refr->GetName(), required);
+							// logger::info("Name {} timerequired {}"sv, refr->GetName(), required);
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
 						}
 						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
-						set_tupledata(data, true, std::chrono::steady_clock::now(), 100ms, "SpellWait_Update");
+						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "SpellWait_Update");
 						GetSingleton()->RegisterforUpdate(refr, data);
 					}
 				}
