@@ -1180,7 +1180,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					}
 
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition()); ;
-					auto time = static_cast<long double>(distance) / static_cast<long double>(mov_speed);
+					auto time = static_cast<double>(distance) / static_cast<double>(mov_speed);
 					// std::setprecision();
 					//long double
 
@@ -1344,7 +1344,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 					// auto time = divide(static_cast<int>(distance), static_cast<int>(attack_speed));
 					// auto time_needed = divide(time, 10);
-					auto time = static_cast<long double>(distance)/static_cast<long double>(attack_speed);
+					auto time = static_cast<double>(distance)/static_cast<double>(attack_speed);
 
 					if (time <= 0.5 || attack_speed == 0.0) {
 						time <= 0.0 || attack_speed == 0.0 ? dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed) 
