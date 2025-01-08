@@ -1533,7 +1533,6 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
 							std::get<0>(data) = false;
 							auto function = std::get<3>(data);
-							auto H = RE::TESDataHandler::GetSingleton();
 							switch (hash(function.c_str(), function.size())) {
 							case "SpellWait_Update"_h:
 								a_actor->SetGraphVariableBool("bUND_Update_spell", false);
@@ -1572,7 +1571,6 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 {
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
-		auto bUND_Update_spell = false;
 
 		GetSingleton()->Process_Updates(a_actor, std::chrono::steady_clock::now());
 	}
