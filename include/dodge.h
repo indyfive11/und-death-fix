@@ -183,8 +183,8 @@ public:
 	void Update(RE::Actor* a_actor, float a_delta);
 	long double round_to(long double value, long double precision = 0.001);
 	void Process_Updates(RE::Actor *a_actor, std::chrono::steady_clock::time_point time_now);
-	void RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data);
-	static void set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data, bool a, std::chrono::steady_clock::time_point b, std::chrono::milliseconds c, std::string d);
+	void RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string> data);
+	static void set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string> data, bool a, std::chrono::steady_clock::time_point b, std::chrono::seconds c, std::string d);
 	
 	static bool GetBoolVariable(RE::Actor *a_actor, std::string a_string);
 	static int GetIntVariable(RE::Actor *a_actor, std::string a_string);
@@ -231,6 +231,6 @@ protected:
 		stl::write_vfunc<RE::Character, 0xAD, Actor_Update>();
 	}
 
-	std::unordered_map<RE::Actor*, std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>>> _Timer;
+	std::unordered_map<RE::Actor*, std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string>>> _Timer;
 	std::shared_mutex  mtx_Timer;
 };
