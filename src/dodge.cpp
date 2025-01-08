@@ -1,6 +1,5 @@
 #include "settings.h"
 #pragma warning(disable: 4100)
-#include <chrono>
 #include <iostream>
 #include <windows.h>
 
@@ -1457,6 +1456,65 @@ long double dodge::round_to(long double value, long double precision)
 //	return false;
 //	
 //}
+
+void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
+{
+	uniqueLocker lock(mtx_Timer);
+	auto         itt = _Timer.find(a_actor);
+	if (itt == _Timer.end()) {
+		std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>> Hen;
+		Hen.push_back(data);
+		_Timer.insert({ a_actor, Hen });
+	} else {
+		itt->second.push_back(data);
+	}
+}
+
+void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data, bool a, std::chrono::steady_clock::time_point b, std::chrono::milliseconds c, std::string d)
+{
+	std::get<0>(data) = a;
+	std::get<1>(data) = b;
+	std::get<2>(data) = c;
+	std::get<3>(data) = d;
+}
+
+void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_point time_now)
+{
+	uniqueLocker lock(mtx_Timer);
+	for (auto it = _Timer.begin(); it != _Timer.end(); ++it) {
+		if (it->first == a_actor) {
+			if (!it->second.empty()) {
+				for (auto data : it->second) {
+					auto update = std::get<0>(data);
+					if (update) {
+						auto time_initial = std::get<1>(data);
+						auto time_required = std::get<2>(data);
+						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
+							std::get<0>(data) = false;
+							auto function = std::get<3>(data);
+							auto H = RE::TESDataHandler::GetSingleton();
+							switch (hash(function.c_str(), function.size())) {
+							case "Decoy_Update"_h:
+
+								break;
+
+							default:
+								break;
+							}
+							std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>>::iterator position = std::find(it->second.begin(), it->second.end(), data);
+							if (position != it->second.end()) {
+								it->second.erase(position);
+							}
+						}
+					}
+				}
+			} else {
+				_Timer.erase(it);
+			}
+			break;
+		}
+	}
+}
 
 void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 {

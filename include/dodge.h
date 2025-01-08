@@ -4,10 +4,13 @@
 #include "RE/M/Misc.h"
 #include "lib/PrecisionAPI.h"
 #include <iomanip>
+#include <chrono>
 
 
 using PRECISION_API::PreHitCallback;
 using std::string;
+using uniqueLocker = std::unique_lock<std::shared_mutex>;
+using sharedLocker = std::shared_lock<std::shared_mutex>;
 
 static float& g_deltaTime = (*(float*)RELOCATION_ID(523660, 410199).address());
 
@@ -170,6 +173,9 @@ public:
 	float confidence_threshold(RE::Actor *a_actor);
 	void Update(RE::Actor* a_actor, float a_delta);
 	long double round_to(long double value, long double precision = 0.001);
+	void Process_Updates(RE::Actor *a_actor, std::chrono::steady_clock::time_point time_now);
+	void RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data);
+	static void set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data, bool a, std::chrono::steady_clock::time_point b, std::chrono::milliseconds c, std::string d);
 
 	static void install_protected()
 	{
@@ -210,4 +216,7 @@ protected:
 	{
 		stl::write_vfunc<RE::Character, 0xAD, Actor_Update>();
 	}
+
+	std::unordered_map<RE::Actor*, std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>>> _Timer;
+	std::shared_mutex  mtx_Timer;
 };
