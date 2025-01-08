@@ -1196,7 +1196,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
 						}
 						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
-						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "BashSprintWait_Update");
+						set_tupledata(data, true, std::chrono::steady_clock::now(), 100ms, "BashSprintWait_Update");
 						GetSingleton()->RegisterforUpdate(refr, data);
 						
 					}
@@ -1358,7 +1358,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
 						}
 						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
-						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "SpellWait_Update");
+						set_tupledata(data, true, std::chrono::steady_clock::now(), 100ms, "SpellWait_Update");
 						GetSingleton()->RegisterforUpdate(refr, data);
 					}
 				}
