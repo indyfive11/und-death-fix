@@ -176,6 +176,11 @@ public:
 	void Process_Updates(RE::Actor *a_actor, std::chrono::steady_clock::time_point time_now);
 	void RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data);
 	static void set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data, bool a, std::chrono::steady_clock::time_point b, std::chrono::milliseconds c, std::string d);
+	
+	static bool GetBoolVariable(RE::Actor *a_actor, std::string a_string);
+	static int GetIntVariable(RE::Actor *a_actor, std::string a_string);
+	static float GetFloatVariable(RE::Actor *a_actor, std::string a_string);
+	static float GetActorValuePercent(RE::Actor *a_actor, RE::ActorValue a_value);
 
 	static void install_protected()
 	{

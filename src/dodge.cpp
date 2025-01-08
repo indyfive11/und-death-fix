@@ -1181,20 +1181,25 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition()); ;
 					auto time = static_cast<long double>(distance) / static_cast<long double>(mov_speed);
-					auto time_needed = time / 10.0;
 					// std::setprecision();
 					//long double
 
-					if (time_needed <= 0.5f || mov_speed == 0.0) {
+					if (time <= 0.5 || mov_speed == 0.0) {
 						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_horizontal, mov_speed);
 
 					} else {
-						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.5) * 10000.0));
-						//refr->SetGraphVariableFloat("fUND_Update_time_required_bashsprint", time_needed - 0.1f);
-						refr->SetGraphVariableInt("iUND_Update_time_required_bashsprint", time_wanted);
-						refr->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", 0.0f);
-						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
+						
 						refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
+						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>((time - 0.5) * 1000.0));
+						if (settings::bCombatlogging_enable) {
+							logger::info("Name {} timerequired {}"sv, refr->GetName(), required);
+							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
+						}
+						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
+						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "BashSprintWait_Update");
+						GetSingleton()->RegisterforUpdate(refr, data);
+						
 					}
 				}
 				continue;
@@ -1340,19 +1345,22 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					// auto time = divide(static_cast<int>(distance), static_cast<int>(attack_speed));
 					// auto time_needed = divide(time, 10);
 					auto time = static_cast<long double>(distance)/static_cast<long double>(attack_speed);
-					auto time_needed = time/10.0;
 
-					if (time_needed <= 0.5f || attack_speed == 0.0) {
-						time_needed <= 0.0f || attack_speed == 0.0 ? dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed) 
+					if (time <= 0.5 || attack_speed == 0.0) {
+						time <= 0.0 || attack_speed == 0.0 ? dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed) 
 						: dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
 
 					} else {
-						auto time_wanted = static_cast<long int>(dodge::round_to((time_needed - 0.5) * 10000.0));
-						//refr->SetGraphVariableFloat("fUND_Update_time_required_spell", time_needed - 0.1);
-						refr->SetGraphVariableInt("iUND_Update_time_required_spell", time_wanted);
-						refr->SetGraphVariableFloat("fUND_Update_time_counter_spell", 0.0f);
-						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
 						refr->SetGraphVariableBool("bUND_Update_spell", true);
+						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>((time - 0.5) * 1000.0));
+						if (settings::bCombatlogging_enable) {
+							logger::info("Name {} timerequired {}"sv, refr->GetName(), required);
+							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
+						}
+						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
+						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "SpellWait_Update");
+						GetSingleton()->RegisterforUpdate(refr, data);
 					}
 				}
 				continue;
@@ -1457,6 +1465,39 @@ long double dodge::round_to(long double value, long double precision)
 //	
 //}
 
+bool dodge::GetBoolVariable(RE::Actor* a_actor, std::string a_string)
+{
+	auto result = false;
+	a_actor->GetGraphVariableBool(a_string, result);
+	return result;
+}
+
+int dodge::GetIntVariable(RE::Actor* a_actor, std::string a_string)
+{
+	auto result = 0;
+	a_actor->GetGraphVariableInt(a_string, result);
+	return result;
+}
+
+float dodge::GetFloatVariable(RE::Actor* a_actor, std::string a_string)
+{
+	auto result = 0.0f;
+	a_actor->GetGraphVariableFloat(a_string, result);
+	return result;
+}
+
+float dodge::GetActorValuePercent(RE::Actor* a_actor, RE::ActorValue a_value)
+{
+	auto result = 0.0f;
+	auto cur_value = a_actor->AsActorValueOwner()->GetActorValue(a_value);
+	auto perm_value = a_actor->AsActorValueOwner()->GetPermanentActorValue(a_value);
+
+	if (perm_value != 0.0f) {
+		result = cur_value / perm_value;
+	}
+	return result;
+}
+
 void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
 {
 	uniqueLocker lock(mtx_Timer);
@@ -1494,8 +1535,20 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 							auto function = std::get<3>(data);
 							auto H = RE::TESDataHandler::GetSingleton();
 							switch (hash(function.c_str(), function.size())) {
-							case "Decoy_Update"_h:
+							case "SpellWait_Update"_h:
+								a_actor->SetGraphVariableBool("bUND_Update_spell", false);
+								if (settings::bCombatlogging_enable) {
+									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
+								}
+								dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, GetFloatVariable(a_actor, "fUND_Update_attackSpeed_spell"));
+								break;
 
+							case "BashSprintWait_Update"_h:
+								a_actor->SetGraphVariableBool("bUND_Update_bashsprint", false);
+								if (settings::bCombatlogging_enable) {
+									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
+								}
+								dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, GetFloatVariable(a_actor, "fUND_Update_attackSpeed_bashsprint"));
 								break;
 
 							default:
@@ -1521,65 +1574,7 @@ void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
 		auto bUND_Update_spell = false;
 
-		if (a_actor->GetGraphVariableBool("bUND_Update_spell", bUND_Update_spell) && bUND_Update_spell) {
-			//float fUND_Update_time_required_spell = 0.0f;
-			int iUND_Update_time_required_spell = 0;
-			float fUND_Update_time_counter_spell = 0.0f;
-			float fUND_Update_attackSpeed_spell = 0.0f;
-			//a_actor->GetGraphVariableFloat("fUND_Update_time_required_spell", fUND_Update_time_required_spell);
-			a_actor->GetGraphVariableInt("iUND_Update_time_required_spell", iUND_Update_time_required_spell);
-			a_actor->GetGraphVariableFloat("fUND_Update_time_counter_spell", fUND_Update_time_counter_spell);
-			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed_spell", fUND_Update_attackSpeed_spell);
-
-			double iRequired = static_cast<double>(iUND_Update_time_required_spell)/10000.0;
-
-			if (settings::bCombatlogging_enable){
-				logger::info("Name {} timerequired {}"sv, a_actor->GetName(), iRequired);
-			}
-			auto counter = fUND_Update_time_counter_spell += g_deltaTime;
-			a_actor->SetGraphVariableFloat("fUND_Update_time_counter_spell", counter);
-			if (settings::bCombatlogging_enable) {
-				logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_spell);
-			}
-			if (counter >= iRequired) {
-				a_actor->SetGraphVariableBool("bUND_Update_spell", false);
-				if (settings::bCombatlogging_enable) {
-					logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_spell);
-				}
-				dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed_spell);
-			}
-		}
-
-		auto bUND_Update_bashsprint = false;
-
-		if (a_actor->GetGraphVariableBool("bUND_Update_bashsprint", bUND_Update_bashsprint) && bUND_Update_bashsprint) {
-			//float fUND_Update_time_required_bashsprint = 0.0f;
-			int iUND_Update_time_required_bashsprint = 0;
-			float fUND_Update_time_counter_bashsprint = 0.0f;
-			float fUND_Update_attackSpeed_bashsprint = 0.0f;
-			//a_actor->GetGraphVariableFloat("fUND_Update_time_required_bashsprint", fUND_Update_time_required_bashsprint);
-			a_actor->GetGraphVariableInt("iUND_Update_time_required_bashsprint", iUND_Update_time_required_bashsprint);
-			a_actor->GetGraphVariableFloat("fUND_Update_time_counter_bashsprint", fUND_Update_time_counter_bashsprint);
-			a_actor->GetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", fUND_Update_attackSpeed_bashsprint);
-
-			double iRequired = static_cast<double>(iUND_Update_time_required_bashsprint) / 10000.0;
-
-			if (settings::bCombatlogging_enable) {
-				logger::info("Name {} timerequired {}"sv, a_actor->GetName(), iRequired);
-			}
-			auto counter = fUND_Update_time_counter_bashsprint += g_deltaTime;
-			a_actor->SetGraphVariableFloat("fUND_Update_time_counter_bashsprint", counter);
-			if (settings::bCombatlogging_enable) {
-				logger::info("Name {} timecounter {}"sv, a_actor->GetName(), fUND_Update_time_counter_bashsprint);
-			}
-			if (counter >= iRequired) {
-				a_actor->SetGraphVariableBool("bUND_Update_bashsprint", false);
-				if (settings::bCombatlogging_enable) {
-					logger::info("Name {} attackspeed {}"sv, a_actor->GetName(), fUND_Update_attackSpeed_bashsprint);
-				}
-				dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, fUND_Update_attackSpeed_bashsprint);
-			}
-		}
+		GetSingleton()->Process_Updates(a_actor, std::chrono::steady_clock::now());
 	}
 }
 
