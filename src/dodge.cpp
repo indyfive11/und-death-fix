@@ -1190,7 +1190,7 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						
 						refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
-						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<int>(GetSingleton()->GenerateRandomInt(300, 900)));
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
@@ -1352,7 +1352,7 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					} else {
 						refr->SetGraphVariableBool("bUND_Update_spell", true);
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
-						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<int>(GetSingleton()->GenerateRandomInt(300, 900)));
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
