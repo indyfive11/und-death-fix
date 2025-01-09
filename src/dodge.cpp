@@ -4,7 +4,7 @@
 
 // using Clock = std::chrono::steady_clock;
 // std::chrono::time_point<std::chrono::steady_clock> start, now;
-// std::chrono::seconds                          duration;
+// std::chrono::milliseconds                          duration;
 
 //#define PI 3.1415926535f
 using writeLock = std::unique_lock<std::shared_mutex>;
@@ -1190,12 +1190,12 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						
 						refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
-						auto required = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<double>(time - 0.5));
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
 						}
-						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string> data;
+						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
 						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "BashSprintWait_Update");
 						GetSingleton()->RegisterforUpdate(refr, data);
 						
@@ -1352,12 +1352,12 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					} else {
 						refr->SetGraphVariableBool("bUND_Update_spell", true);
 						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
-						auto required = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<double>(time - 0.5));
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
 						}
-						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string> data;
+						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
 						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "SpellWait_Update");
 						GetSingleton()->RegisterforUpdate(refr, data);
 					}
@@ -1497,12 +1497,12 @@ float dodge::GetActorValuePercent(RE::Actor* a_actor, RE::ActorValue a_value)
 	return result;
 }
 
-void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string> data)
+void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
 {
 	uniqueLocker lock(mtx_Timer);
 	auto         itt = _Timer.find(a_actor);
 	if (itt == _Timer.end()) {
-		std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string>> Hen;
+		std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>> Hen;
 		Hen.push_back(data);
 		_Timer.insert({ a_actor, Hen });
 	} else {
@@ -1510,7 +1510,7 @@ void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::
 	}
 }
 
-void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string> data, bool a, std::chrono::steady_clock::time_point b, std::chrono::seconds c, std::string d)
+void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data, bool a, std::chrono::steady_clock::time_point b, std::chrono::milliseconds c, std::string d)
 {
 	std::get<0>(data) = a;
 	std::get<1>(data) = b;
@@ -1529,14 +1529,14 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 					if (update) {
 						auto time_initial = std::get<1>(data);
 						auto time_required = std::get<2>(data);
-						if (duration_cast<std::chrono::seconds>(time_now - time_initial).count() >= time_required.count()) {
+						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
 							std::get<0>(data) = false;
 							auto function = std::get<3>(data);
 							switch (hash(function.c_str(), function.size())) {
 							case "SpellWait_Update"_h:
 								a_actor->SetGraphVariableBool("bUND_Update_spell", false);
 								if (settings::bCombatlogging_enable) {
-									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::seconds>(time_now - time_initial).count());
+									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
 								}
 								dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, GetFloatVariable(a_actor, "fUND_Update_attackSpeed_spell"));
 								break;
@@ -1544,7 +1544,7 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 							case "BashSprintWait_Update"_h:
 								a_actor->SetGraphVariableBool("bUND_Update_bashsprint", false);
 								if (settings::bCombatlogging_enable) {
-									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::seconds>(time_now - time_initial).count());
+									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
 								}
 								dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, GetFloatVariable(a_actor, "fUND_Update_attackSpeed_bashsprint"));
 								break;
@@ -1552,7 +1552,7 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 							default:
 								break;
 							}
-							std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::seconds, std::string>>::iterator position = std::find(it->second.begin(), it->second.end(), data);
+							std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>>::iterator position = std::find(it->second.begin(), it->second.end(), data);
 							if (position != it->second.end()) {
 								it->second.erase(position);
 							}
