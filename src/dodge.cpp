@@ -1518,25 +1518,18 @@ void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point
 
 void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_point time_now)
 {
-	logger::info("Started Update");
 	uniqueLocker lock(mtx_Timer);
 	for (auto it = _Timer.begin(); it != _Timer.end(); ++it) {
-		logger::info("Update 1");
 		if (it->first == a_actor) {
-			logger::info("Update 2");
 			if (!it->second.empty()) {
-				logger::info("Update 3");
 				for (auto data : it->second) {
-					logger::info("Update 4");
 					bool update;
 					std::chrono::steady_clock::time_point time_initial;
 					std::chrono::milliseconds time_required;
 					std::string function;
 					std::tie(update, time_initial, time_required, function) = data;
 					if (update) {
-						logger::info("Update 5");
 						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
-							logger::info("Update 6");
 							//std::get<0>(data) = false;
 							switch (hash(function.c_str(), function.size())) {
 							case "SpellWait_Update"_h:
@@ -1563,7 +1556,6 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 								it->second.erase(position);
 							}
 						}else{
-							logger::info("Update 7");
 							logger::info("Name {} currenttime {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
 						}
 					}
