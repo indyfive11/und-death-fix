@@ -1186,16 +1186,13 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 
 					} else {
 						
-						refr->SetGraphVariableBool("bUND_Update_bashsprint", true);
-						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_bashsprint", mov_speed);
 						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
 						}
-						
-						GetSingleton()->RegisterforUpdate(refr, std::make_tuple(true, std::chrono::steady_clock::now(), required, "BashSprintWait_Update"));
-						
+
+						GetSingleton()->RegisterforUpdate(refr, std::make_tuple(mov_speed, std::chrono::steady_clock::now(), required, "BashSprintWait_Update"));
 					}
 				}
 				continue;
@@ -1345,15 +1342,13 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						: dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
 
 					} else {
-						refr->SetGraphVariableBool("bUND_Update_spell", true);
-						refr->SetGraphVariableFloat("fUND_Update_attackSpeed_spell", attack_speed);
 						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
 						}
 
-						GetSingleton()->RegisterforUpdate(refr, std::make_tuple(true, std::chrono::steady_clock::now(), required, "SpellWait_Update"));
+						GetSingleton()->RegisterforUpdate(refr, std::make_tuple(attack_speed, std::chrono::steady_clock::now(), required, "SpellWait_Update"));
 					}
 				}
 				continue;
@@ -1491,12 +1486,12 @@ float dodge::GetActorValuePercent(RE::Actor* a_actor, RE::ActorValue a_value)
 	return result;
 }
 
-void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
+void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<float, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
 {
 	uniqueLocker lock(mtx_Timer);
 	auto         itt = _Timer.find(a_actor);
 	if (itt == _Timer.end()) {
-		std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>> Hen;
+		std::vector<std::tuple<float, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>> Hen;
 		Hen.push_back(data);
 		_Timer.insert({ a_actor, Hen });
 	} else {
@@ -1519,38 +1514,34 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 		if (it->first == a_actor) {
 			if (!it->second.empty()) {
 				for (auto data : it->second) {
-					bool update;
+					float a_speed;
 					std::chrono::steady_clock::time_point time_initial;
 					std::chrono::milliseconds time_required;
 					std::string function;
-					std::tie(update, time_initial, time_required, function) = data;
-					if (update) {
-						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
-							//std::get<0>(data) = false;
-							switch (hash(function.c_str(), function.size())) {
-							case "SpellWait_Update"_h:
-								a_actor->SetGraphVariableBool("bUND_Update_spell", false);
-								if (settings::bCombatlogging_enable) {
-									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
-								}
-								dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, GetFloatVariable(a_actor, "fUND_Update_attackSpeed_spell"));
-								break;
-
-							case "BashSprintWait_Update"_h:
-								a_actor->SetGraphVariableBool("bUND_Update_bashsprint", false);
-								if (settings::bCombatlogging_enable) {
-									logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
-								}
-								dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, GetFloatVariable(a_actor, "fUND_Update_attackSpeed_bashsprint"));
-								break;
-
-							default:
-								break;
+					std::tie(a_speed, time_initial, time_required, function) = data;
+					if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
+						//std::get<0>(data) = false;
+						switch (hash(function.c_str(), function.size())) {
+						case "SpellWait_Update"_h:
+							if (settings::bCombatlogging_enable) {
+								logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
 							}
-							std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>>::iterator position = std::find(it->second.begin(), it->second.end(), data);
-							if (position != it->second.end()) {
-								it->second.erase(position);
+							dodge::GetSingleton()->Shouts_Spells_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, a_speed);
+							break;
+
+						case "BashSprintWait_Update"_h:
+							if (settings::bCombatlogging_enable) {
+								logger::info("Name {} timecomplete {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
 							}
+							dodge::GetSingleton()->BashSprint_attempt_dodge(a_actor, &dodge_directions_tk_horizontal, a_speed);
+							break;
+
+						default:
+							break;
+						}
+						std::vector<std::tuple<float, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>>::iterator position = std::find(it->second.begin(), it->second.end(), data);
+						if (position != it->second.end()) {
+							it->second.erase(position);
 						}
 					}
 				}
