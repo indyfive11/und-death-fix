@@ -1172,11 +1172,9 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 						continue;
 					}
 
-					auto bUND_Update_bashsprint = false;
-
-					if (refr->GetGraphVariableBool("bUND_Update_bashsprint", bUND_Update_bashsprint) && bUND_Update_bashsprint) {
-						continue;
-					}
+					// if (GetBoolVariable(refr, "bUND_Update_bashsprint")) {
+					// 	continue;
+					// }
 
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition()); ;
 					auto time = static_cast<double>(distance) / static_cast<double>(mov_speed);
@@ -1334,11 +1332,9 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 						continue;
 					}
 
-					auto bUND_Update_spell = false;
-
-					if (refr->GetGraphVariableBool("bUND_Update_spell", bUND_Update_spell) && bUND_Update_spell) {
-						continue;
-					}
+					// if (GetBoolVariable(refr, "bUND_Update_spell")) {
+					// 	continue;
+					// }
 					auto distance = refr->GetPosition().GetDistance(a_attacker->GetPosition());
 					// auto time = divide(static_cast<int>(distance), static_cast<int>(attack_speed));
 					// auto time_needed = divide(time, 10);
