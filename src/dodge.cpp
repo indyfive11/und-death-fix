@@ -1520,16 +1520,23 @@ void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point
 
 void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_point time_now)
 {
+	logger::info("Started Update");
 	uniqueLocker lock(mtx_Timer);
 	for (auto it = _Timer.begin(); it != _Timer.end(); ++it) {
+		logger::info("Update 1");
 		if (it->first == a_actor) {
+			logger::info("Update 2");
 			if (!it->second.empty()) {
+				logger::info("Update 3");
 				for (auto data : it->second) {
+					logger::info("Update 4");
 					auto update = std::get<0>(data);
 					if (update) {
+						logger::info("Update 5");
 						auto time_initial = std::get<1>(data);
 						auto time_required = std::get<2>(data);
 						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
+							logger::info("Update 6");
 							std::get<0>(data) = false;
 							auto function = std::get<3>(data);
 							switch (hash(function.c_str(), function.size())) {
@@ -1557,6 +1564,7 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 								it->second.erase(position);
 							}
 						}else{
+							logger::info("Update 7");
 							logger::info("Name {} currenttime {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
 						}
 					}
@@ -1572,6 +1580,7 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 {
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
+		logger::info("Update Event Received");
 
 		GetSingleton()->Process_Updates(a_actor, std::chrono::steady_clock::now());
 	}
