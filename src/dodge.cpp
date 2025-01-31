@@ -1537,7 +1537,7 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 						logger::info("Update 5");
 						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
 							logger::info("Update 6");
-							std::get<0>(data) = false;
+							//std::get<0>(data) = false;
 							switch (hash(function.c_str(), function.size())) {
 							case "SpellWait_Update"_h:
 								a_actor->SetGraphVariableBool("bUND_Update_spell", false);
