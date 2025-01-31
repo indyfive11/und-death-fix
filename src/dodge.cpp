@@ -1499,7 +1499,7 @@ float dodge::GetActorValuePercent(RE::Actor* a_actor, RE::ActorValue a_value)
 
 void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
 {
-	uniqueLocker lock(mtx_Timer);
+	// uniqueLocker lock(mtx_Timer);
 	auto         itt = _Timer.find(a_actor);
 	if (itt == _Timer.end()) {
 		std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>> Hen;
@@ -1521,7 +1521,7 @@ void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point
 void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_point time_now)
 {
 	logger::info("Started Update");
-	uniqueLocker lock(mtx_Timer);
+	// uniqueLocker lock(mtx_Timer);
 	for (auto it = _Timer.begin(); it != _Timer.end(); ++it) {
 		logger::info("Update 1");
 		if (it->first == a_actor) {
@@ -1580,7 +1580,7 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 void dodge::Update(RE::Actor* a_actor, [[maybe_unused]] float a_delta)
 {
 	if (a_actor->GetActorRuntimeData().currentProcess && a_actor->GetActorRuntimeData().currentProcess->InHighProcess() && a_actor->Is3DLoaded()) {
-		logger::info("Update Event Received");
+		//logger::info("Update Event Received");
 
 		GetSingleton()->Process_Updates(a_actor, std::chrono::steady_clock::now());
 	}
