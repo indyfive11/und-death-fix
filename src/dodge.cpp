@@ -1195,9 +1195,8 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
 						}
-						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
-						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "BashSprintWait_Update");
-						GetSingleton()->RegisterforUpdate(refr, data);
+						
+						GetSingleton()->RegisterforUpdate(refr, std::make_tuple(true, std::chrono::steady_clock::now(), required, "BashSprintWait_Update"));
 						
 					}
 				}
@@ -1357,9 +1356,8 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
 						}
-						std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data;
-						set_tupledata(data, true, std::chrono::steady_clock::now(), required, "SpellWait_Update");
-						GetSingleton()->RegisterforUpdate(refr, data);
+
+						GetSingleton()->RegisterforUpdate(refr, std::make_tuple(true, std::chrono::steady_clock::now(), required, "SpellWait_Update"));
 					}
 				}
 				continue;
@@ -1499,7 +1497,7 @@ float dodge::GetActorValuePercent(RE::Actor* a_actor, RE::ActorValue a_value)
 
 void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
 {
-	// uniqueLocker lock(mtx_Timer);
+	uniqueLocker lock(mtx_Timer);
 	auto         itt = _Timer.find(a_actor);
 	if (itt == _Timer.end()) {
 		std::vector<std::tuple<bool, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>> Hen;
@@ -1521,7 +1519,7 @@ void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point
 void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_point time_now)
 {
 	logger::info("Started Update");
-	// uniqueLocker lock(mtx_Timer);
+	uniqueLocker lock(mtx_Timer);
 	for (auto it = _Timer.begin(); it != _Timer.end(); ++it) {
 		logger::info("Update 1");
 		if (it->first == a_actor) {
