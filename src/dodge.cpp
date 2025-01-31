@@ -1528,15 +1528,16 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 				logger::info("Update 3");
 				for (auto data : it->second) {
 					logger::info("Update 4");
-					auto update = std::get<0>(data);
+					bool update;
+					std::chrono::steady_clock::time_point time_initial;
+					std::chrono::milliseconds time_required;
+					std::string function;
+					std::tie(update, time_initial, time_required, function) = data;
 					if (update) {
 						logger::info("Update 5");
-						auto time_initial = std::get<1>(data);
-						auto time_required = std::get<2>(data);
 						if (duration_cast<std::chrono::milliseconds>(time_now - time_initial).count() >= time_required.count()) {
 							logger::info("Update 6");
 							std::get<0>(data) = false;
-							auto function = std::get<3>(data);
 							switch (hash(function.c_str(), function.size())) {
 							case "SpellWait_Update"_h:
 								a_actor->SetGraphVariableBool("bUND_Update_spell", false);
