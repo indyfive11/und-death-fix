@@ -1488,7 +1488,7 @@ float dodge::GetActorValuePercent(RE::Actor* a_actor, RE::ActorValue a_value)
 
 void dodge::RegisterforUpdate(RE::Actor* a_actor, std::tuple<float, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string> data)
 {
-	uniqueLocker lock(mtx_Timer);
+	// uniqueLocker lock(mtx_Timer);
 	auto         itt = _Timer.find(a_actor);
 	if (itt == _Timer.end()) {
 		std::vector<std::tuple<float, std::chrono::steady_clock::time_point, std::chrono::milliseconds, std::string>> Hen;
@@ -1509,7 +1509,7 @@ void dodge::set_tupledata(std::tuple<bool, std::chrono::steady_clock::time_point
 
 void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_point time_now)
 {
-	uniqueLocker lock(mtx_Timer);
+	// uniqueLocker lock(mtx_Timer);
 	for (auto it = _Timer.begin(); it != _Timer.end(); ++it) {
 		if (it->first == a_actor) {
 			if (!it->second.empty()) {
