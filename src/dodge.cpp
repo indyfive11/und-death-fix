@@ -1555,8 +1555,6 @@ void dodge::Process_Updates(RE::Actor* a_actor, std::chrono::steady_clock::time_
 							if (position != it->second.end()) {
 								it->second.erase(position);
 							}
-						}else{
-							logger::info("Name {} currenttime {}"sv, a_actor->GetName(), duration_cast<std::chrono::milliseconds>(time_now - time_initial).count());
 						}
 					}
 				}
