@@ -1181,12 +1181,12 @@ void dodge::react_to_bash_sprint(RE::Actor* a_attacker, float attack_range, floa
 					// std::setprecision();
 					//long double
 
-					if (time <= 0.5 || mov_speed == 0.0) {
+					if (time <= 1.0 || mov_speed == 0.0) {
 						dodge::GetSingleton()->BashSprint_attempt_dodge(refr, &dodge_directions_tk_horizontal, mov_speed);
 
 					} else {
 						
-						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 1.0));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), mov_speed);
@@ -1337,12 +1337,12 @@ void dodge::react_to_shouts_spells(RE::Actor* a_attacker, float attack_range, fl
 					// auto time_needed = divide(time, 10);
 					auto time = static_cast<double>(distance)/static_cast<double>(attack_speed);
 
-					if (time <= 0.5 || attack_speed == 0.0) {
+					if (time <= 1.0 || attack_speed == 0.0) {
 						time <= 0.0 || attack_speed == 0.0 ? dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_reactive, attack_speed) 
 						: dodge::GetSingleton()->Shouts_Spells_attempt_dodge(refr, &dodge_directions_tk_horizontal, attack_speed);
 
 					} else {
-						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 0.5));
+						auto required = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(time - 1.0));
 						if (settings::bCombatlogging_enable) {
 							logger::info("Name {} timerequired {}"sv, refr->GetName(), required.count());
 							logger::info("Name {} attackspeed {}"sv, refr->GetName(), attack_speed);
