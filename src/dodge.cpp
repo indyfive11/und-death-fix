@@ -1623,9 +1623,8 @@ void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions,
 
 	if (attack_speed > 0.0f) {
 		divided = true;
-		auto value = static_cast<int>((static_cast<double>(dodge_chance) / static_cast<double>(attack_speed)) * 10000.0);
-		auto value_mid = value / 2;
-		iRequired = static_cast<double>(value_mid) / 10000.0;
+		auto value = static_cast<double>(dodge_chance) / static_cast<double>(attack_speed);
+		iRequired = value * 1000.0;
 		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (iRequired)) {
 			return;
 		}
@@ -1729,9 +1728,8 @@ void dodge::NormalAttack_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* 
 
 	if (attack_speed > 0.0f) {
 		divided = true;
-		auto value = static_cast<int>((static_cast<double>(dodge_chance) / static_cast<double>(attack_speed)) * 10000.0);
-		auto value_mid = value / 2;
-		iRequired = static_cast<double>(value_mid) / 10000.0;
+		auto value = static_cast<double>(dodge_chance) / static_cast<double>(attack_speed);
+		iRequired = value * 1000.0;
 		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (iRequired)) {
 			return;
 		}
@@ -1795,9 +1793,8 @@ void dodge::Shouts_Spells_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set*
 
 	if (attack_speed > 0.0f){
 		divided = true;
-		auto value = static_cast<int>((static_cast<double>(dodge_chance) / static_cast<double>(attack_speed)) * 10000.0);
-		auto value_mid = value / 2;
-		iRequired = static_cast<double>(value_mid) / 10000.0;
+		auto value = static_cast<double>(dodge_chance) / static_cast<double>(attack_speed);
+		iRequired = value * 1000.0;
 		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (iRequired)) {
 			return;
 		}
@@ -1901,9 +1898,8 @@ void dodge::BashSprint_attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_
 
 	if (mov_speed > 0.0f) {
 		divided = true;
-		auto value = static_cast<int>((static_cast<double>(dodge_chance) / static_cast<double>(mov_speed)) * 10000.0);
-		auto value_mid = value/2;
-		iRequired = static_cast<double>(value_mid) / 10000.0;
+		auto value = static_cast<double>(dodge_chance) / static_cast<double>(mov_speed);
+		iRequired = value * 1000.0;
 		if (dodge::GetSingleton()->GenerateRandomFloat(0.0f, 1.0f) > (iRequired)) {
 			return;
 		}
