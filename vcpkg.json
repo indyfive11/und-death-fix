@@ -6,18 +6,13 @@
     "description": "SKSE plugin based on CommonLibSSE, for unified AE/SE/VR deployment.",
     "homepage": "https://www.skyrimng.com",
     "license": "Apache-2.0",
-    "features": {
-        "plugin": {
-            "description": "Build the SKSE plugin.",
-            "dependencies": [
-                "commonlibsse-ng",
-                "nlohmann-json",
-                "simpleini",
-                "magic-enum"
-            ]
-        }
-    },
-    "default-features": [
-        "plugin"
+    "dependencies": [
+        "directxmath",
+        "directxtk",
+        "rapidcsv",
+        "spdlog",
+        "nlohmann-json",
+        "simpleini",
+        "magic-enum"
     ]
 }
