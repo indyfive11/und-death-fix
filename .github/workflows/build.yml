@@ -17,7 +17,7 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
-          git checkout cc288af760054fa489574bd8e22d05aa8fa01e5c
+          git checkout 98ffd29b9e6a07db04a0899d1be351e9e3bd1e54
           ./bootstrap-vcpkg.bat -disableMetrics
         shell: cmd
 
