@@ -13,16 +13,19 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgGitCommitId: '7476f0d4e77d3333fbb249657df8251c28c4faae'
+      - name: Bootstrap vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          git checkout cc288af760054fa489574bd8e22d05aa8fa01e5c
+          ./bootstrap-vcpkg.bat -disableMetrics
+        shell: cmd
 
       - name: Configure CMake
         run: >
           cmake -B build
           -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake"
+          -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
           -DBUILD_SKYRIM=ON
 
