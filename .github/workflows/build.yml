@@ -28,6 +28,7 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
           -DBUILD_SKYRIM=ON
+          -DBUILD_TESTS=OFF
           -DCommonLibSSEPath="${{ github.workspace }}/extern/CommonLibSSE-NG"
 
       - name: Build
