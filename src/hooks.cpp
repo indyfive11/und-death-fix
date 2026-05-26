@@ -15,6 +15,9 @@ namespace hooks
 
 		//std::string eventTag = a_event->tag.c_str();
 		RE::Actor* actor = const_cast<RE::TESObjectREFR*>(a_event.holder)->As<RE::Actor>();
+		if (!actor || actor->IsDead()) {
+			return fn ? (this->*fn)(a_event, src) : RE::BSEventNotifyControl::kContinue;
+		}
 		//bool bUseAltAtk = false;
 		switch (hash(a_event.tag.c_str(), a_event.tag.size())) {
 		case "TKDR_DodgeStart"_h:
@@ -256,6 +259,9 @@ namespace hooks
 
 	ptr_CombatPath on_combatBehavior_backoff_createPath::create_path(RE::Actor* a_actor, RE::NiPoint3* a_newPos, float a3, int speed_ind)
 	{
+		if (!a_actor || a_actor->IsDead()) {
+			return _create_path(a_actor, a_newPos, a3, speed_ind);
+		}
 		if (!Utils::Actor::isHumanoid(a_actor)) {
 			if (!(a_actor->HasKeywordString("VLS_Serana_Key") || a_actor->HasKeywordString("VLS_Valerica_Key"))) {
 				return _create_path(a_actor, a_newPos, a3, speed_ind);
@@ -286,6 +292,9 @@ namespace hooks
 
 	ptr_CombatPath on_combatBehavior_circle_createPath::create_path(RE::Actor* a_actor, RE::NiPoint3* a_newPos, float a3, int speed_ind)
 	{
+		if (!a_actor || a_actor->IsDead()) {
+			return _create_path(a_actor, a_newPos, a3, speed_ind);
+		}
 		if (!Utils::Actor::isHumanoid(a_actor)) {
 			if (!(a_actor->HasKeywordString("VLS_Serana_Key") || a_actor->HasKeywordString("VLS_Valerica_Key"))) {
 				return _create_path(a_actor, a_newPos, a3, speed_ind);
@@ -316,6 +325,9 @@ namespace hooks
 
 	ptr_CombatPath on_combatBehavior_fallback_createPath::create_path(RE::Actor* a_actor, RE::NiPoint3* a_newPos, float a3, int speed_ind)
 	{
+		if (!a_actor || a_actor->IsDead()) {
+			return _create_path(a_actor, a_newPos, a3, speed_ind);
+		}
 		if (!Utils::Actor::isHumanoid(a_actor)) {
 			if (!(a_actor->HasKeywordString("VLS_Serana_Key") || a_actor->HasKeywordString("VLS_Valerica_Key"))) {
 				return _create_path(a_actor, a_newPos, a3, speed_ind);
@@ -346,6 +358,9 @@ namespace hooks
 
 	ptr_CombatPath on_combatBehavior_dodgethreat_createPath::create_path(RE::Actor* a_actor, RE::NiPoint3* a_newPos, float a3, int speed_ind)
 	{
+		if (!a_actor || a_actor->IsDead()) {
+			return _create_path(a_actor, a_newPos, a3, speed_ind);
+		}
 		if (!Utils::Actor::isHumanoid(a_actor)) {
 			if (!(a_actor->HasKeywordString("VLS_Serana_Key") || a_actor->HasKeywordString("VLS_Valerica_Key"))) {
 				return _create_path(a_actor, a_newPos, a3, speed_ind);

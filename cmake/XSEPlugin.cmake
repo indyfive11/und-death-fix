@@ -43,7 +43,7 @@ configure_file(
 )
 
 configure_file(
-	${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in
+	${CMAKE_CURRENT_SOURCE_DIR}/cmake/Version.rc.in
 	${CMAKE_CURRENT_BINARY_DIR}/cmake/version.rc
 	@ONLY
 )
@@ -136,10 +136,15 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 
 if (BUILD_SKYRIM)
-	find_package(CommonLibSSE REQUIRED)
+	if(DEFINED CommonLibSSEPath AND EXISTS "${CommonLibSSEPath}")
+		add_subdirectory("${CommonLibSSEPath}" CommonLibSSE EXCLUDE_FROM_ALL)
+		add_library(CommonLibSSE::CommonLibSSE ALIAS CommonLibSSE)
+	else()
+		find_package(CommonLibSSE REQUIRED)
+	endif()
 	target_link_libraries(
-		${PROJECT_NAME} 
-		PUBLIC 
+		${PROJECT_NAME}
+		PUBLIC
 			CommonLibSSE::CommonLibSSE
 		PRIVATE
 			nlohmann_json::nlohmann_json

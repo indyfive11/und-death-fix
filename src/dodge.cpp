@@ -1613,9 +1613,12 @@ bool dodge::able_dodge(RE::Actor* a_actor)
 /*Attempt to dodge an incoming threat, choosing one of the directions from A_DIRECTIONS.*/
 void dodge::attempt_dodge(RE::Actor* a_actor, const dodge_dir_set* a_directions, float attack_speed, bool a_forceDodge)
 {
+	if (!a_actor || a_actor->IsDead()) {
+		return;
+	}
 	bool divided = false;
 	double iRequired = 0.0;
-	
+
     auto DS = dodge::GetSingleton();
 	const float dodge_chance = a_forceDodge ? 1.0f : get_dodge_chance(a_actor, DS->Armourr, DS->Protagnist_Reflexess, DS->CStylee);
 

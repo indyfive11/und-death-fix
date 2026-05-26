@@ -1,0 +1,37 @@
+name: Build UND
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: 'cc288af760054fa489574bd8e22d05aa8fa01e5c'
+
+      - name: Configure CMake
+        run: >
+          cmake -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
+          -DBUILD_SKYRIM=ON
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: UND-death-fix
+          path: build/Release/UND.dll
+          if-no-files-found: error
